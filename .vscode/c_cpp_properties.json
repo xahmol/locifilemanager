@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "CC65",
+            "includePath": [
+                "${default}",
+                "include",
+                "/home/xahmol/cc65/include"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-gcc-x86"
+        }
+    ],
+    "version": 4
+}
