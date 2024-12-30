@@ -296,7 +296,6 @@ struct LOCICFGSTRUCT
 {
     unsigned char devnr;
     unsigned char validdev[MAXDEV];
-    char path[256];
 };
 extern struct LOCICFGSTRUCT locicfg;
 void get_locicfg();

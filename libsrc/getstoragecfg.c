@@ -49,8 +49,6 @@ void get_locicfg()
         }
     }
     closedir(dir);
-
-    strcpy(locicfg.path, "0:/");
 }
 
 const char *get_loci_devname(unsigned char devid, unsigned char maxlength)

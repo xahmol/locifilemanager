@@ -85,7 +85,10 @@ int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog,
     {
         len = read_xram(FM_XRAM_ADDR, FM_XRAM_SIZE, fd_src);
         write_xram(FM_XRAM_ADDR, len, fd_dst);
-        cputcxy(progx, progy, progress_str[0x03 & cnt++]);
+        if (prog)
+        {
+            cputcxy(progx, progy, progress_str[0x03 & cnt++]);
+        }
     } while (len == FM_XRAM_SIZE);
     close(fd_src);
     close(fd_dst);
