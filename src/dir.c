@@ -269,20 +269,19 @@ void dir_print_id_and_path(unsigned char dirnr)
     // Set colors based on whether pane is active or not
     bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
 
-
     // Print device name
     gotoxy(0, ypos);
     cputc(A_FWBLACK);
     cputc(bg_color);
     cclear(38);
-    cputs(get_loci_devname(presentdir[dirnr].drive,38));
+    cputs(get_loci_devname(presentdir[dirnr].drive, 38));
 
     // Get drive ID
-    gotoxy(0, ypos+1);
+    gotoxy(0, ypos + 1);
     cputc(A_FWBLACK);
     cputc(bg_color);
     cclear(38);
-    gotoxy(2, ypos+1);
+    gotoxy(2, ypos + 1);
     strncpy(buffer, presentdir[dirnr].path, 3);
     buffer[3] = 0;
     cputs(buffer);
@@ -371,10 +370,12 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
     // Clear area
     cleararea(ypos, 13);
 
+    // Print header
+    dir_print_id_and_path(dirnr);
+
     // Read directory contents
     if (readdir)
     {
-        dir_print_id_and_path(dirnr);
         dir_read(dirnr, filter);
     }
 
@@ -416,4 +417,76 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
 
     present = presentdir[dirnr].firstprint;
     dir_get_element(present);
+}
+
+void dir_get_next_drive(unsigned char dirnr)
+// Get the next avaailable drive for pane
+{
+    unsigned char drive = presentdir[dirnr].drive;
+    unsigned char valid = 0;
+
+    do
+    {
+        drive++;
+        if (drive > MAXDEV)
+        {
+            drive = 0;
+        }
+        if (locicfg.validdev[drive])
+        {
+            valid = 1;
+        }
+    } while (!valid);
+
+    // Set drive
+    presentdir[dirnr].drive = drive;
+
+    // Set root as path
+    sprintf(buffer, "%u:/", presentdir[dirnr].drive);
+    strcpy(presentdir[dirnr].path, buffer);
+
+    // Draw new dir
+    dir_draw(dirnr, 1);
+}
+
+void dir_get_prev_drive(unsigned char dirnr)
+// Get the next avaailable drive for pane
+{
+    unsigned char drive = presentdir[dirnr].drive;
+    unsigned char valid = 0;
+
+    do
+    {
+        if (drive > 0)
+        {
+            drive--;
+        }
+        else
+        {
+            drive = MAXDEV;
+        }
+
+        if (locicfg.validdev[drive])
+        {
+            valid = 1;
+        }
+    } while (!valid);
+
+    // Set drive
+    presentdir[dirnr].drive = drive;
+
+    // Set root as path
+    sprintf(buffer, "%u:/", presentdir[dirnr].drive);
+    strcpy(presentdir[dirnr].path, buffer);
+
+    // Draw new dir
+    dir_draw(dirnr, 1);
+}
+
+void dir_switch_pane()
+// Switch between active and non active pane
+{
+    activepane = !activepane;
+    dir_draw(0, 0);
+    dir_draw(1, 0);
 }

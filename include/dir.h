@@ -23,8 +23,8 @@ struct DirMeta
 
 struct DirElement
 {
-    char name[64];         // Entry name
-    struct DirMeta meta;   // Meta data
+    char name[64];       // Entry name
+    struct DirMeta meta; // Meta data
 };
 extern struct DirElement presentdirelement;
 
@@ -55,5 +55,8 @@ void dir_read(unsigned char dirnr, unsigned char filter);
 void dir_print_id_and_path(unsigned char dirnr);
 void dir_print_entry(unsigned dirnr, unsigned char printpos);
 void dir_draw(unsigned char dirnr, unsigned char readdir);
+void dir_get_next_drive(unsigned char dirnr);
+void dir_get_prev_drive(unsigned char dirnr);
+void dir_switch_pane();
 
 #endif // __DIR_H_

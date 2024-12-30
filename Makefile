@@ -107,5 +107,5 @@ clean:
 #	cd BUILD; $(RM) *.*
 
 # Execute in emulator: use make run
-#run: $(DISK_DSK)
-#	cd $(EMUDIR); $(EMU) $(EMUARG) "$(PROJECT_DIR)/$(DISK_DSK)"
+run: $(PROGRAM)
+	cd $(EMUDIR); $(EMU) $(EMUARG) "$(PROJECT_DIR)/$(PROGRAM)"

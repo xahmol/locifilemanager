@@ -178,8 +178,6 @@ int __fastcall__ read_xram(unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack(const void *buf, unsigned count, int fildes);
 int __fastcall__ write_xram(unsigned buf, unsigned count, int fildes);
 
-void __fastcall__ getcwd_loci(char *buf, unsigned char length);
-
 int __fastcall__ mount(int drive, register const char *path, register const char *filename);
 int __fastcall__ umount(int drive);
 long __fastcall__ tap_seek(long pos);
@@ -199,6 +197,8 @@ void __fastcall__ mia_clear_restore_buffer(void);
 unsigned char __fastcall__ mia_get_vmode(void);
 
 int __fastcall__ uname(struct utsname *buf);
+void __fastcall__ getcwd_xram(char* address, unsigned char len);
+void __fastcall__ getcwd_loci(char *buffer, unsigned char len);
 
 /* XREG location helpers */
 
@@ -295,9 +295,11 @@ void __fastcall__ rewinddir(DIR *dir);
 struct LOCICFGSTRUCT
 {
     unsigned char devnr;
-    unsigned char validdev[MAXDEV];
+    unsigned char validdev[MAXDEV+1];
+    struct utsname uname;
 };
 extern struct LOCICFGSTRUCT locicfg;
+
 void get_locicfg();
 const char *get_loci_devname(unsigned char devid, unsigned char maxlength);
 

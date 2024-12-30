@@ -7,6 +7,8 @@
 ;
 ; Apapted and extended by Xander Mol, 2024
 ;
+; Sodiumlightbaby 2024
+;
 ; LOCI getcwd XRAM version
 ; Returns the LOCI path of the assumed boot image (ROM,DSK or TAP)
 ; Does not go directly to XRAM on LOCI side. Saves extra FW function
@@ -18,33 +20,35 @@
     .import         popax
     .importzp       ptr1, ptr2
 
-; void __fastcall__ getcwd_loci(char* buf, unsigned char length);
+; void __fastcall__ getcwd_xram(char* address, unsigned char len);
 ; ----------------------------------------------------------------------
-; Function to get the current working directory to buffer in RAM
+; Function to copy LOCI current working directory to XRAM
 ; ----------------------------------------------------------------------
 ; Input:
-;       length          --> Maximum length of the path
-; Output:
-;       Path cppied to destination
+;       address         --> Destination in XRAM
+;       len             --> Maximum length
 ; Get the parameters from stack as follows:
-;       value           --> A
-;       buf             --> ptr2
+;       len             --> ptr1
+;       address         --> A/X
 _getcwd_xram:
-    sta     ptr1                        ;Save value from A
+    sta     ptr1                    ;max lenght
+    stx     ptr1+1
     lda     #255
     ldx     #0
     jsr     _mia_set_ax
     lda     #MIA_OP_GETCWD
     jsr     _mia_call_int_errno
-    jsr     popax                       ;xram address
-    sta     ptr2
-    stx     ptr2+1
-    ldy     ptr1                        ;get length
+    jsr     popax                   ;xram address
+    sta     MIA_ADDR0
+    stx     MIA_ADDR0+1
+    lda     #1
+    sta     MIA_STEP0
+    ldy     ptr1                    ;TODO Assuming max 255 chars
 @loop:
-    lda     MIA_XSTACK                  ;get byte from XSTACK
-    sta     (ptr2),Y                    ;copy to RAM
-    beq     @done                       ;stop when zero terminated
-    dey                                 ;decrease length
-    bne     @loop                       ;stop at max length
+    lda     MIA_XSTACK
+    sta     MIA_RW0
+    beq     @done                   ;stop when zero terminated
+    dey
+    bne     @loop                   ;stop at max length
 @done:
     rts

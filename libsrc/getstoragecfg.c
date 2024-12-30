@@ -8,27 +8,47 @@
 // - cc65 by Ullrich von Bassewitz,  Based on code by Groepaz. https://github.com/cc65/cc65
 //
 // Apapted and extended by Xander Mol, 2024
-
+#include <stdlib.h>
 #include <loci.h>
 #include <string.h>
 #include <conio.h>
+#include <osdklib.h>
 
 struct LOCICFGSTRUCT locicfg;
 
 void get_locicfg()
 // Function to get the LOCI configuration
-// Output:  locicfg - structure with LOCI configuration
-//          locicfg.devnr - number of devices
-//          locicfg.validdev - array with valid devices: 0 - not valid, 1 - valid
-//          locicfg.path - path of the current device
+// Output:
+//  -   Exits program with error message if no LOCI detected
+//  -   Else fills locicfg - structure with LOCI configuration
+//      -   locicfg.devnr - number of devices
+//      -   locicfg.validdev - array with valid devices: 0 - not valid, 1 - valid
+//      -   locicfg.uname - uname structure with Loci device data
 {
     unsigned char devid;
 
     DIR *dir;
     struct dirent *fil;
 
+    // Detect if Loci is present
+    if (peek(0x0319) != 'L')
+    {
+        cprintf("No LOCI device detected.\n\r");
+        cprintf("\n\rPress key to exit\n\r");
+        cgetc();
+        clrscr();
+        setflags(SCREEN);
+        exit(1);
+    }
+
     // Wipe config
     memset(&locicfg, 0, sizeof(locicfg));
+
+    // Get uname data
+    _sysuname(&locicfg.uname);
+
+    // Set drive 0 as valid as it is always valid
+    locicfg.validdev[0] = 1;
 
     // Get dir of root dir to parse devices
     dir = opendir("");
