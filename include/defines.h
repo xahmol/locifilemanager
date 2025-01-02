@@ -3,7 +3,6 @@
 
 // Global variables
 extern char buffer[41];
-extern char pathbuffer[256];
 extern char version[22];
 
 /* Char defines */

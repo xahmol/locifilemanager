@@ -41,7 +41,7 @@ EMUARG                  += --vsynchack off
 EMUARG                  += --turbotape on
 
 ## C Sources and library objects to use
-SOURCES = src/main.c src/menu.c src/dir.c
+SOURCES = src/main.c src/menu.c src/dir.c src/file.c
 LSOURCES = $(wildcard libsrc/*.c)
 LASOURCES = $(wildcard libsrc/*.s)
 LIBRARY = lib/loci.lib

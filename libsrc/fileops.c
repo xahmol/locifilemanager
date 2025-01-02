@@ -57,6 +57,20 @@ int __fastcall__ file_load(const char *file, void *dst, unsigned int count)
     return error;
 }
 
+int __fastcall__ file_exists(const char *file)
+// Function to check if a file exists
+// Input:   file - filename
+// Output:  1 if file exists, 0 if not
+{
+    int fd = open(file, O_RDONLY | O_EXCL);
+    if (fd < 0)
+    {
+        return 0;
+    }
+    close(fd);
+    return 1;
+}
+
 int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char ypos)
 // Function to copy a file
 // Input:   dst - destination filename
@@ -84,15 +98,15 @@ int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog,
 
     do
     {
-        len = read_xram(FM_XRAM_ADDR, FM_XRAM_SIZE, fd_src);
-        write_xram(FM_XRAM_ADDR, len, fd_dst);
+        len = read_xram(COPYBUF_XRAM_ADDR, COPYBUF_XRAM_SIZE, fd_src);
+        write_xram(COPYBUF_XRAM_ADDR, len, fd_dst);
         if (prog)
         {
             gotoxy(38, ypos);
             cputc(A_FWGREEN);
             cputc(progress_str[0x03 & cnt++]);
         }
-    } while (len == FM_XRAM_SIZE);
+    } while (len == COPYBUF_XRAM_SIZE);
     close(fd_src);
     close(fd_dst);
     return 0;

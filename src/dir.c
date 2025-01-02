@@ -25,6 +25,7 @@ unsigned next;
 unsigned char filter;
 unsigned char enterchoice;
 unsigned char confirm;
+unsigned char sort;
 char *diraddress[2] = {(char *)DIR1BASE, (char *)DIR2BASE};
 
 char dir_entry_types[6][4] =
@@ -37,8 +38,10 @@ char dir_entry_types[6][4] =
         "   "};
 
 static const char progressBar[4] = {48, 53, 93, 95};
+char pathbuffer[256];
+char pathbuffer2[256];
 
-// Function prototypes
+// Functions
 void cleararea(unsigned char ypos, unsigned char height)
 //  Clear an area of the screen
 //  Input: ypos = startline of area
@@ -52,6 +55,22 @@ void cleararea(unsigned char ypos, unsigned char height)
         cputc(A_BGBLACK);
         cclear(38);
     }
+}
+
+char* truncate(const char* src, unsigned char length)
+{
+    // Truncate string if too long
+    if (strlen(src) > length)
+    {
+        strncpy(pathbuffer2, src, length);
+        pathbuffer2[length] = 0;
+    }
+    else
+    {
+        strcpy(pathbuffer2, src);
+    }
+
+    return pathbuffer2;
 }
 
 void dir_get_element(unsigned address)
@@ -85,6 +104,9 @@ void dir_read(unsigned char dirnr, unsigned char filter)
     unsigned char xpos = 3;
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
     unsigned char bg_color;
+    unsigned element;
+    struct DirElement bufferdir;
+    unsigned workaddress;
 
     // Set colors based on whether pane is active or not
     bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
@@ -256,11 +278,54 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                 presentdir[dirnr].firstelement = present;
                 presentdir[dirnr].firstprint = present;
                 presentdirelement.meta.prev = 0;
+                previous = present;
+                presentdirelement.meta.next = 0;
             }
             else
             {
-                presentdirelement.meta.prev = previous;              // Set prev in new entry
-                xram_memcpy_to(previous, &present, sizeof(present)); // Set next in previous entry
+                if (sort)
+                {
+                    // Find element to insert after
+                    element = presentdir[dirnr].firstelement;
+                    while (element)
+                    {
+                        workaddress = element;
+                        xram_memcpy_from(&bufferdir.meta, workaddress, sizeof(bufferdir.meta));
+                        workaddress += sizeof(bufferdir.meta);
+                        xram_memcpy_from(bufferdir.name, workaddress, bufferdir.meta.length);
+                        if (strcmp(bufferdir.name, file->d_name) > 0)
+                        {
+                            if(!bufferdir.meta.prev)
+                            {
+                                presentdirelement.meta.prev = previous;
+                                presentdirelement.meta.next = element;
+                                bufferdir.meta.prev = present;
+                                presentdir[dirnr].firstelement = present;
+                                xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
+                            }
+                            else
+                            {
+                                presentdirelement.meta.prev = bufferdir.meta.prev;
+                                presentdirelement.meta.next = element;
+                                bufferdir.meta.prev = present;
+                                xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
+                                xram_memcpy_from(&bufferdir.meta, presentdirelement.meta.prev, sizeof(bufferdir.meta));
+                                bufferdir.meta.next = present;
+                                xram_memcpy_to(presentdirelement.meta.prev, &bufferdir.meta, sizeof(bufferdir.meta));
+                            }
+                            break;
+                        }
+                        element = presentdirelement.meta.next;
+                        previous = element;
+                    }
+                }
+                else
+                {
+                    presentdirelement.meta.prev = previous;              // Set prev in new entry
+                    xram_memcpy_to(previous, &present, sizeof(present)); // Set next in previous entry
+                    previous = present;
+                    presentdirelement.meta.next = 0;
+                }
 
                 // Debug
                 // cprintf("Dump previous:\n\r");
@@ -273,8 +338,6 @@ void dir_read(unsigned char dirnr, unsigned char filter)
             // Debug
             // cprintf("\n\rPrev: %4x Pres: %4x ", previous, present);
 
-            previous = present;
-            presentdirelement.meta.next = 0;
             presentdirelement.meta.select = 0;
             presentdirelement.meta.type = presenttype;
             datalength++;
@@ -312,7 +375,6 @@ void dir_print_id_and_path(unsigned char dirnr)
 // Input: dirnr = directory number
 {
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
-    unsigned char length;
     unsigned char bg_color;
 
     // Set colors based on whether pane is active or not
@@ -335,20 +397,8 @@ void dir_print_id_and_path(unsigned char dirnr)
     buffer[3] = 0;
     cputs(buffer);
 
-    // Get rest of path
-    strcpy(pathbuffer, presentdir[dirnr].path + 3);
-
-    // Check if it fits else shorten
-    length = strlen(pathbuffer);
-    if (length > 35)
-    {
-        strcpy(buffer, pathbuffer + length - 35);
-    }
-    else
-    {
-        strcpy(buffer, pathbuffer);
-    }
-    cputs(buffer);
+    // Get rest of path and check if it fits else shorten
+    cputs(truncate(presentdir[dirnr].path + 3,35));
 }
 
 void dir_print_entry(unsigned dirnr, unsigned char printpos)
@@ -391,19 +441,8 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
         cputc(' ');
     }
 
-    // Truncate filename if too long
-    if (presentdirelement.meta.length > 32)
-    {
-        strncpy(pathbuffer, presentdirelement.name, 32);
-        pathbuffer[32] = 0;
-    }
-    else
-    {
-        strcpy(pathbuffer, presentdirelement.name);
-    }
-
     // Print entry data
-    sprintf(buffer, "%-32s %s", pathbuffer, dir_entry_types[presentdirelement.meta.type - 1]);
+    sprintf(buffer, "%-32s %s", truncate(presentdirelement.name,32), dir_entry_types[presentdirelement.meta.type - 1]);
     cputs(buffer);
 }
 
@@ -784,4 +823,20 @@ void dir_parentdir()
         // Draw new dir
         dir_draw(activepane, 1);
     }
+}
+
+void dir_togglesort()
+// Toggle sort order of active pane
+{
+    sort = !sort;
+    dir_draw(activepane, 1);
+    if (sort)
+    {
+        strcpy(buffer, "On  ");
+    }
+    else
+    {
+        strcpy(buffer, "Off  ");
+    }
+    strcpy(pulldown_titles[0][3] + 10, buffer);
 }

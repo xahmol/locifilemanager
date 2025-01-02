@@ -12,10 +12,10 @@
 #include "defines.h"
 #include "menu.h"
 #include "dir.h"
+#include "file.h"
 
 // Global variables
 char buffer[41];
-char pathbuffer[256];
 char version[22];
 
 // Main loop
@@ -29,6 +29,7 @@ void main()
     filter = 0;
     enterchoice = 0;
     confirm = 0;
+    sort = 0;
 
     // Init
     setflags(SCREEN + NOKEYCLICK);
@@ -170,6 +171,21 @@ void main()
         case 'i':
             // i: Inverse selection
             dir_select_inverse();
+            break;
+
+        case 'o':
+            // o: Toggle sort
+            dir_togglesort();
+            break;
+
+        case 'c':
+            // c: Copy files
+            file_copy_selected();
+            break;
+
+        case CH_DEL:
+            // Del: Delete files
+            file_delete();
             break;
 
         default:

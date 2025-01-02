@@ -24,11 +24,12 @@ struct MenuBar menubar = {
     {0, 0, 0, 0, 0},
     0};
 
-char pulldown_options[PULLDOWN_NUMBER] = {4, 7, 2, 4, 2, 2, 3, 5, 4, 2};
+char pulldown_options[PULLDOWN_NUMBER] = {5, 7, 6, 4, 2, 2, 3, 5, 4, 2};
 char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] = {
     {"Confirm:  Once  ",
      "Enter:    Select",
      "[F]ilter: None  ",
+     "S[O]rt:   Off  ",
      "[ESC] Exit      "},
     {"[S]elect toggle ",
      "Select [A]ll    ",
@@ -38,7 +39,11 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "[R]ename        ",
      "[C]opy          "},
     {"[/] Go to root",
-     "[C LEFT] Back "},
+     "[C LEFT] Back ",
+     "Page [D]own   ",
+     "Page [U]p     ",
+     "[T]op         ",
+     "[B]ottom      "},
     {"[M]ount    ",
      "[U]nmount  ",
      "[T]arget: A",
@@ -410,7 +415,7 @@ unsigned char menu_main()
             xpos = menubar.xstart[menubarchoice - 1];
             if (xpos + strlen(pulldown_titles[menubarchoice - 1][0]) > 36)
             {
-                xpos = 37- strlen(pulldown_titles[menubarchoice - 1][0]);
+                xpos = 37 - strlen(pulldown_titles[menubarchoice - 1][0]);
             }
             menuoptionchoice = menu_pulldown(xpos, menubar.ypos + 1, menubarchoice - 1, 1);
             if (menuoptionchoice == 18)

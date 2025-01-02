@@ -3,9 +3,9 @@
 
 // Defines
 // Base addresses for dir entries in XRAM
-#define DIR1BASE FM_XRAM_ADDR            // Base address for dir 1
-#define DIR2BASE (FM_XRAM_ADDR + 0x1000) // Base address for dir 2
-#define DIRSIZE 0x1000                   // Room for directory entries
+#define DIR1BASE COPYBUF_XRAM_ADDR + COPYBUF_XRAM_SIZE // Base address for dir 1
+#define DIRSIZE 0x0C00                                 // Room for directory entries
+#define DIR2BASE (DIR1BASE + DIRSIZE)                  // Base address for dir 2
 
 // Pane location and height
 #define PANE1_YPOS 3
@@ -15,8 +15,8 @@
 // Structs and variables
 struct DirMeta
 {
-    unsigned next;           // Pointer to next element
-    unsigned prev;           // Pointer to previous element
+    unsigned next;        // Pointer to next element
+    unsigned prev;        // Pointer to previous element
     unsigned char type;   // Type: 1=dir, 2=DSK, 3=TAP, 4=ROM, 5=LCE
     unsigned char select; // Select: 0=not selected, 1=selected
     unsigned char length; // Length of name
@@ -31,10 +31,10 @@ extern struct DirElement presentdirelement;
 
 struct Directory
 {
-    unsigned firstelement;     // Pointer to first element
-    unsigned firstprint;       // Pointer to first element to print
-    unsigned lastprint;        // Pointer to last element to print
-    unsigned present;          // Pointer to active element
+    unsigned firstelement;  // Pointer to first element
+    unsigned firstprint;    // Pointer to first element to print
+    unsigned lastprint;     // Pointer to last element to print
+    unsigned present;       // Pointer to active element
     unsigned char drive;    // Drive number
     unsigned char position; // Position in directory
     char path[256];         // Path
@@ -53,9 +53,13 @@ extern unsigned next;
 extern unsigned char filter;
 extern unsigned char enterchoice;
 extern unsigned char confirm;
+extern unsigned char sort;
+extern char pathbuffer[256];
+extern char pathbuffer2[256];
 
 // Function prototypes
 void cleararea(unsigned char ypos, unsigned char height);
+char *truncate(const char *src, unsigned char length);
 void dir_get_element(unsigned address);
 void dir_save_element(unsigned address);
 void dir_read(unsigned char dirnr, unsigned char filter);
@@ -76,5 +80,6 @@ void dir_select_all(unsigned char select);
 void dir_select_inverse();
 void dir_gotoroot();
 void dir_parentdir();
+void dir_togglesort();
 
 #endif // __DIR_H_

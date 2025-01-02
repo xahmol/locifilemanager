@@ -20,7 +20,7 @@ void __fastcall__ getcwd_loci(char* buf, unsigned char len)
 {
     unsigned char val;
     unsigned char count = 0;
-    unsigned address = FM_XRAM_ADDR;
+    unsigned address = COPYBUF_XRAM_ADDR;
 
     getcwd_xram(address, 255);
 

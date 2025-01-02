@@ -305,14 +305,15 @@ void get_locicfg();
 const char *get_loci_devname(unsigned char devid, unsigned char maxlength);
 
 // File operations
-#define FM_XRAM_ADDR 0x8000
-#define FM_XRAM_SIZE 0x2000
+#define COPYBUF_XRAM_ADDR 0x8000
+#define COPYBUF_XRAM_SIZE 0x0800
 
 extern const char progress_str[];
 
 int __fastcall__ file_save(const char *file, const void *src, unsigned int count);
 int __fastcall__ file_load(const char *file, void *dst, unsigned int count);
 int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char ypos);
+int __fastcall__ file_exists(const char *file);
 
 unsigned char __fastcall__ _sysrename(const char *oldpath, const char *newpath);
 unsigned char __fastcall__ _sysremove(const char *name);
