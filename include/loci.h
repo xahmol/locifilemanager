@@ -178,6 +178,9 @@ int __fastcall__ read_xram(unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack(const void *buf, unsigned count, int fildes);
 int __fastcall__ write_xram(unsigned buf, unsigned count, int fildes);
 
+int __fastcall__ getcwd_xram(unsigned buf, unsigned len);
+void __fastcall__ getcwd_loci(char* buf, unsigned char len);
+
 int __fastcall__ mount(int drive, register const char *path, register const char *filename);
 int __fastcall__ umount(int drive);
 long __fastcall__ tap_seek(long pos);
@@ -197,8 +200,6 @@ void __fastcall__ mia_clear_restore_buffer(void);
 unsigned char __fastcall__ mia_get_vmode(void);
 
 int __fastcall__ uname(struct utsname *buf);
-void __fastcall__ getcwd_xram(char* address, unsigned char len);
-void __fastcall__ getcwd_loci(char *buffer, unsigned char len);
 
 /* XREG location helpers */
 
@@ -311,17 +312,17 @@ extern const char progress_str[];
 
 int __fastcall__ file_save(const char *file, const void *src, unsigned int count);
 int __fastcall__ file_load(const char *file, void *dst, unsigned int count);
-int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char progx, unsigned char progy);
+int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char ypos);
 
 unsigned char __fastcall__ _sysrename(const char *oldpath, const char *newpath);
 unsigned char __fastcall__ _sysremove(const char *name);
 int __fastcall__ _sysuname(struct utsname *buf);
 
 // XRAM MemCopy
-void *__fastcall__ xram_memcpy_to(void *dest, const void *src, size_t count);
-void *__fastcall__ xram_memcpy_from(void *dest, const void *src, size_t count);
-void *__fastcall__ xram_poke(void *dest, unsigned char value);
-unsigned char *__fastcall__ xram_peek(void *src);
+void *__fastcall__ xram_memcpy_to(unsigned dest, const void *src, size_t count);
+void *__fastcall__ xram_memcpy_from(void *dest, unsigned src, size_t count);
+void *__fastcall__ xram_poke(unsigned dest, unsigned char value);
+unsigned char *__fastcall__ xram_peek(unsigned src);
 
 // Overlay RAM memcopy. To make use of RAM normally under ROM ($C000-$FFFF)
 void __fastcall__ enable_overlay_ram(void);

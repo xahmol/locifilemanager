@@ -7,15 +7,16 @@
 #define DIR2BASE (FM_XRAM_ADDR + 0x1000) // Base address for dir 2
 #define DIRSIZE 0x1000                   // Room for directory entries
 
-// Pane location
+// Pane location and height
 #define PANE1_YPOS 3
 #define PANE2_YPOS 15
+#define PANE_HEIGHT 10
 
 // Structs and variables
 struct DirMeta
 {
-    char *next;           // Pointer to next element
-    char *prev;           // Pointer to previous element
+    unsigned next;           // Pointer to next element
+    unsigned prev;           // Pointer to previous element
     unsigned char type;   // Type: 1=dir, 2=DSK, 3=TAP, 4=ROM, 5=LCE
     unsigned char select; // Select: 0=not selected, 1=selected
     unsigned char length; // Length of name
@@ -30,27 +31,33 @@ extern struct DirElement presentdirelement;
 
 struct Directory
 {
-    char *firstelement;     // Pointer to first element
-    char *lastelement;      // Pointer to last element
-    char *firstprint;       // Pointer to first element to print
-    char *lastprint;        // Pointer to last element to print
+    unsigned firstelement;     // Pointer to first element
+    unsigned firstprint;       // Pointer to first element to print
+    unsigned lastprint;        // Pointer to last element to print
+    unsigned present;          // Pointer to active element
     unsigned char drive;    // Drive number
     unsigned char position; // Position in directory
     char path[256];         // Path
+    unsigned address;       // Address in XRAM for next entry
 };
 extern struct Directory presentdir[2];
 
 extern DIR *dir;
 extern struct dirent *file;
 
-extern char *diraddress[2];
 extern char dir_entry_types[6][4];
 extern unsigned char activepane;
+extern unsigned present;
+extern unsigned previous;
+extern unsigned next;
 extern unsigned char filter;
+extern unsigned char enterchoice;
+extern unsigned char confirm;
 
 // Function prototypes
 void cleararea(unsigned char ypos, unsigned char height);
-void dir_get_element(char *address);
+void dir_get_element(unsigned address);
+void dir_save_element(unsigned address);
 void dir_read(unsigned char dirnr, unsigned char filter);
 void dir_print_id_and_path(unsigned char dirnr);
 void dir_print_entry(unsigned dirnr, unsigned char printpos);
@@ -58,5 +65,16 @@ void dir_draw(unsigned char dirnr, unsigned char readdir);
 void dir_get_next_drive(unsigned char dirnr);
 void dir_get_prev_drive(unsigned char dirnr);
 void dir_switch_pane();
+void dir_go_down();
+void dir_go_up();
+void dir_pagedown();
+void dir_pageup();
+void dir_top();
+void dir_bottom();
+void dir_select_toggle();
+void dir_select_all(unsigned char select);
+void dir_select_inverse();
+void dir_gotoroot();
+void dir_parentdir();
 
 #endif // __DIR_H_

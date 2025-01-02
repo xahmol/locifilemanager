@@ -15,7 +15,7 @@
 
 .code
 
-; void* __fastcall__ xram_memcpy_to (void* dest, const void* src, size_t count);
+; void* __fastcall__ xram_memcpy_to (unsigned dest, const void* src, size_t count);
 ; ----------------------------------------------------------------------
 ; Function to copy data from RAM to XRAM
 ; ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ mct3:   lda     (ptr1),Y                ; Read a byte
 
 mctd:   jmp     popax                   ; Pop ptr and return as result
 
-; void* __fastcall__ xram_memcpy_from (void* dest, const void* src, size_t count);
+; void* __fastcall__ xram_memcpy_from (void* dest, unsigned src, size_t count);
 ; ----------------------------------------------------------------------
 ; Function to copy data from XRAM to RAM
 ; ----------------------------------------------------------------------
@@ -110,7 +110,7 @@ mcf3:   lda     MIA_RW0                 ; Read a byte
 
 mcfd:   jmp     popax                   ; Pop ptr and return as result
 
-; void* __fastcall__ xram_poke (void* dest, unsigned char value);
+; void* __fastcall__ xram_poke (unsigned dest, unsigned char value);
 ; ----------------------------------------------------------------------
 ; Function to write a single byte to XRAM
 ; ----------------------------------------------------------------------
@@ -137,7 +137,7 @@ _xram_poke:
         ldy     #0                      ; Clear Y
         rts                             ; Done
 
-; unsigned char* __fastcall__ xram_peek (void* src);
+; unsigned char* __fastcall__ xram_peek (unsigned src);
 ; ----------------------------------------------------------------------
 ; Function to read a single byte from XRAM
 ; ----------------------------------------------------------------------

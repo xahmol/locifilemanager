@@ -10,7 +10,7 @@
 #define MENUBAR_MAXOPTIONS 5  // Number of options in main menu bar
 #define MENUBAR_MAXLENGTH 12  // Maxiumum length of main menu bar option names
 #define PULLDOWN_NUMBER 10    // Number of pull down menus defined
-#define PULLDOWN_MAXOPTIONS 6 // Maximum number of options for pull down meus
+#define PULLDOWN_MAXOPTIONS 7 // Maximum number of options for pull down meus
 #define PULLDOWN_MAXLENGTH 17 // Maximum length of pull down menu option names
 #define MENU_YESNO 9          // Number for Yes No pull down menu
 

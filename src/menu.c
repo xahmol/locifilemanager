@@ -24,7 +24,7 @@ struct MenuBar menubar = {
     {0, 0, 0, 0, 0},
     0};
 
-char pulldown_options[PULLDOWN_NUMBER] = {4, 6, 2, 4, 2, 2, 3, 5, 4, 2};
+char pulldown_options[PULLDOWN_NUMBER] = {4, 7, 2, 4, 2, 2, 3, 5, 4, 2};
 char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] = {
     {"Confirm:  Once  ",
      "Enter:    Select",
@@ -32,6 +32,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "[ESC] Exit      "},
     {"[S]elect toggle ",
      "Select [A]ll    ",
+     "Select [N]one   ",
      "[I]nverse select",
      "[DEL]ete        ",
      "[R]ename        ",

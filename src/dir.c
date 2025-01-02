@@ -19,7 +19,12 @@ struct Directory presentdir[2];
 DIR *dir;
 struct dirent *file;
 unsigned char activepane;
+unsigned present;
+unsigned previous;
+unsigned next;
 unsigned char filter;
+unsigned char enterchoice;
+unsigned char confirm;
 char *diraddress[2] = {(char *)DIR1BASE, (char *)DIR2BASE};
 
 char dir_entry_types[6][4] =
@@ -30,6 +35,8 @@ char dir_entry_types[6][4] =
         "ROM",
         "LCE",
         "   "};
+
+static const char progressBar[4] = {48, 53, 93, 95};
 
 // Function prototypes
 void cleararea(unsigned char ypos, unsigned char height)
@@ -47,14 +54,24 @@ void cleararea(unsigned char ypos, unsigned char height)
     }
 }
 
-void dir_get_element(char *address)
+void dir_get_element(unsigned address)
 // Get directory element from address
 // Input: address = address of element
 {
-    char *workaddress = address;
+    unsigned workaddress = address;
     xram_memcpy_from(&presentdirelement.meta, workaddress, sizeof(presentdirelement.meta));
     workaddress += sizeof(presentdirelement.meta);
     xram_memcpy_from(presentdirelement.name, workaddress, presentdirelement.meta.length);
+}
+
+void dir_save_element(unsigned address)
+// Save directory element to address
+// Input: address = address of element
+{
+    unsigned workaddress = address;
+    xram_memcpy_to(workaddress, &presentdirelement.meta, sizeof(presentdirelement.meta));
+    workaddress += sizeof(presentdirelement.meta);
+    xram_memcpy_to(workaddress, presentdirelement.name, presentdirelement.meta.length);
 }
 
 void dir_read(unsigned char dirnr, unsigned char filter)
@@ -62,18 +79,32 @@ void dir_read(unsigned char dirnr, unsigned char filter)
 // Input: dirnr = directory number
 //        filter = filter for file type
 {
-    char *previous = 0;
-    char *present;
     unsigned char presenttype;
-    unsigned char datalength, count;
+    unsigned char datalength;
+    unsigned char count = 0;
+    unsigned char xpos = 3;
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
+    unsigned char bg_color;
+
+    // Set colors based on whether pane is active or not
+    bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
+    ypos++;
+
+    // Prepare progress bar
+    gotoxy(0, ypos);
+    cputc(A_FWBLACK);
+    cputc(bg_color);
+    cputc(A_ALT);
+    cclear(37);
+
+    previous = 0;
 
     // Debug
     // unsigned char i;
 
     // Reset dir address
-    diraddress[dirnr] = (dirnr) ? (char *)DIR2BASE : (char *)DIR1BASE;
-    present = diraddress[dirnr];
+    presentdir[dirnr].address = (dirnr) ? DIR2BASE : DIR1BASE;
+    present = presentdir[dirnr].address;
 
     // Clear directory values
     presentdir[dirnr].firstelement = 0;
@@ -117,7 +148,19 @@ void dir_read(unsigned char dirnr, unsigned char filter)
         datalength = strlen(file->d_name);
 
         // print progress counter
-        cputcxy(39, ypos, progress_str[0x03 & count++]);
+        if ((count >> 2) > 36)
+        {
+            xpos = 3;
+            count = 0;
+            gotoxy(xpos, ypos);
+            cclear(37);
+        }
+        else
+        {
+            gotoxy(xpos + (count >> 2), ypos);
+            cputc(progressBar[count & 3]);
+            ++count;
+        }
 
         // Check if entry is a dir by checking if bit 4 of first byte is set
         if (file->d_attrib & DIR_ATTR_DIR)
@@ -184,6 +227,12 @@ void dir_read(unsigned char dirnr, unsigned char filter)
             presenttype = 6;
         }
 
+        // Filter out hidden files
+        if (file->d_name[0] == '.')
+        {
+            presenttype = 0;
+        }
+
         // Filter out non-matching file types if filter is set
         if (filter && presenttype > 1 && presenttype != (filter - 1))
         {
@@ -196,7 +245,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
         if (presenttype)
         {
             // Check if sufficent memory is left
-            if (diraddress[dirnr] + datalength + sizeof(presentdirelement.meta) > diraddress[dirnr] + DIRSIZE - 1)
+            if (presentdir[dirnr].address + datalength + sizeof(presentdirelement.meta) > presentdir[dirnr].address + DIRSIZE - 1)
             {
                 return;
             }
@@ -232,15 +281,15 @@ void dir_read(unsigned char dirnr, unsigned char filter)
             presentdirelement.meta.length = datalength;
 
             // Set meta data
-            xram_memcpy_to(diraddress[dirnr], &presentdirelement.meta, sizeof(presentdirelement.meta));
-            diraddress[dirnr] += sizeof(presentdirelement.meta);
+            xram_memcpy_to(presentdir[dirnr].address, &presentdirelement.meta, sizeof(presentdirelement.meta));
+            presentdir[dirnr].address += sizeof(presentdirelement.meta);
 
             // Set filename
-            xram_memcpy_to(diraddress[dirnr], file->d_name, datalength);
-            diraddress[dirnr] += datalength;
+            xram_memcpy_to(presentdir[dirnr].address, file->d_name, datalength);
+            presentdir[dirnr].address += datalength;
 
             // Update present pointer
-            present = diraddress[dirnr];
+            present = presentdir[dirnr].address;
 
             // Debug
             // cprintf("Next: %4x\n\r", present);
@@ -255,7 +304,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
     closedir(dir);
     present = presentdir[dirnr].firstelement;
     dir_get_element(present);
-    cputcxy(39, ypos, CH_SPACE);
+    dir_print_id_and_path(dirnr);
 }
 
 void dir_print_id_and_path(unsigned char dirnr)
@@ -365,10 +414,9 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
 {
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
     unsigned char printpos = 0;
-    char *present;
 
     // Clear area
-    cleararea(ypos, 13);
+    cleararea(ypos, 12);
 
     // Print header
     dir_print_id_and_path(dirnr);
@@ -377,6 +425,7 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
     if (readdir)
     {
         dir_read(dirnr, filter);
+        presentdir[dirnr].present = presentdir[dirnr].firstprint;
     }
 
     // Print no data if no valid entries in dir are found
@@ -412,7 +461,7 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
                 present = presentdirelement.meta.next;
             }
 
-        } while (printpos < 10);
+        } while (printpos < PANE_HEIGHT);
     }
 
     present = presentdir[dirnr].firstprint;
@@ -489,4 +538,250 @@ void dir_switch_pane()
     activepane = !activepane;
     dir_draw(0, 0);
     dir_draw(1, 0);
+}
+
+void dir_go_down()
+// Scroll down in dir of active pane
+{
+    if (presentdir[activepane].firstelement && presentdirelement.meta.next)
+    {
+        present = presentdirelement.meta.next;
+        dir_get_element(present);
+        presentdir[activepane].present = present;
+        presentdir[activepane].position++;
+        if (presentdir[activepane].position > PANE_HEIGHT - 1)
+        {
+            presentdir[activepane].position = 0;
+            presentdir[activepane].firstprint = present;
+            dir_draw(activepane, 0);
+        }
+        else
+        {
+            previous = presentdirelement.meta.prev;
+            dir_get_element(previous);
+            dir_print_entry(activepane, presentdir[activepane].position - 1);
+            dir_get_element(present);
+            dir_print_entry(activepane, presentdir[activepane].position);
+        }
+    }
+}
+
+void dir_go_up()
+// Scroll up in dir of active pane
+{
+    unsigned char element;
+
+    if (presentdir[activepane].firstelement && presentdirelement.meta.prev)
+    {
+        present = presentdirelement.meta.prev;
+        dir_get_element(present);
+        presentdir[activepane].present = present;
+        if (!presentdir[activepane].position)
+        {
+            presentdir[activepane].position = PANE_HEIGHT - 1;
+            for (element = 0; element < 9; element++)
+            {
+                present = presentdirelement.meta.prev;
+                dir_get_element(present);
+            }
+            presentdir[activepane].firstprint = present;
+            dir_draw(activepane, 0);
+        }
+        else
+        {
+            presentdir[activepane].position--;
+            next = presentdirelement.meta.next;
+            dir_get_element(next);
+            dir_print_entry(activepane, presentdir[activepane].position + 1);
+            dir_get_element(present);
+            dir_print_entry(activepane, presentdir[activepane].position);
+        }
+    }
+}
+
+void dir_pagedown()
+// Page down in dir of active pane
+{
+    unsigned char element;
+
+    if (presentdir[activepane].firstelement && presentdirelement.meta.next)
+    {
+        for (element = 0; element < PANE_HEIGHT; element++)
+        {
+            if (!presentdirelement.meta.next)
+            {
+                break;
+            }
+            present = presentdirelement.meta.next;
+            dir_get_element(present);
+        }
+        presentdir[activepane].firstprint = present;
+        presentdir[activepane].present = present;
+        presentdir[activepane].position = 0;
+        dir_draw(activepane, 0);
+    }
+}
+
+void dir_pageup()
+// Page up in dir of active pane
+{
+    unsigned char element;
+
+    if (presentdir[activepane].firstelement && presentdirelement.meta.prev)
+    {
+        for (element = 0; element < PANE_HEIGHT; element++)
+        {
+            if (!presentdirelement.meta.next)
+            {
+                break;
+            }
+            present = presentdirelement.meta.prev;
+            dir_get_element(present);
+        }
+        presentdir[activepane].firstprint = present;
+        presentdir[activepane].present = present;
+        presentdir[activepane].position = 0;
+        dir_draw(activepane, 0);
+    }
+}
+
+void dir_top()
+// Go to top of dir in active pane
+{
+    if (presentdir[activepane].firstelement)
+    {
+        present = presentdir[activepane].firstelement;
+        dir_get_element(present);
+        presentdir[activepane].present = present;
+        presentdir[activepane].position = 0;
+        presentdir[activepane].firstprint = present;
+        dir_draw(activepane, 0);
+    }
+}
+
+void dir_bottom()
+// Go to bottom of dir in active pane
+{
+    unsigned char element;
+
+    if (presentdir[activepane].firstelement)
+    {
+        present = presentdir[activepane].firstelement;
+        do
+        {
+            dir_get_element(present);
+            if (presentdirelement.meta.next)
+            {
+                present = presentdirelement.meta.next;
+            }
+            else
+            {
+                break;
+            }
+        } while (1);
+        presentdir[activepane].present = present;
+        presentdir[activepane].position = PANE_HEIGHT - 1;
+        for (element = 0; element < PANE_HEIGHT - 1; element++)
+        {
+            present = presentdirelement.meta.prev;
+            dir_get_element(present);
+        }
+        presentdir[activepane].firstprint = present;
+        present = presentdir[activepane].lastprint;
+        dir_draw(activepane, 0);
+    }
+}
+
+void dir_select_toggle()
+// Toggle selection of active entry
+{
+    if (presentdirelement.meta.type > 1)
+    {
+        presentdirelement.meta.select = !presentdirelement.meta.select;
+        dir_save_element(present);
+        dir_print_entry(activepane, presentdir[activepane].position);
+    }
+}
+
+void dir_select_all(unsigned char select)
+// Select or deselect all entries in active pane
+// Input: select = 1 to select, 0 to deselect
+{
+    unsigned element;
+
+    if (presentdir[activepane].firstelement)
+    {
+        element = presentdir[activepane].firstelement;
+        do
+        {
+            dir_get_element(element);
+            if (presentdirelement.meta.type > 1)
+            {
+                presentdirelement.meta.select = select;
+                dir_save_element(element);
+            }
+            element = presentdirelement.meta.next;
+        } while (element);
+        dir_draw(activepane, 0);
+    }
+}
+
+void dir_select_inverse()
+// Select all entries in active pane
+{
+    unsigned element;
+
+    if (presentdir[activepane].firstelement)
+    {
+        element = presentdir[activepane].firstelement;
+        do
+        {
+            dir_get_element(element);
+            if (presentdirelement.meta.type > 1)
+            {
+                presentdirelement.meta.select = !presentdirelement.meta.select;
+                dir_save_element(element);
+            }
+            element = presentdirelement.meta.next;
+        } while (element);
+        dir_draw(activepane, 0);
+    }
+}
+
+void dir_gotoroot()
+// Go to root of active pane
+{
+    // Set root as path
+    sprintf(pathbuffer, "%u:/", presentdir[activepane].drive);
+    strcpy(presentdir[activepane].path, pathbuffer);
+
+    // Draw new dir
+    dir_draw(activepane, 1);
+}
+
+void dir_parentdir()
+// Go to parent dir of active pane
+{
+    unsigned char length;
+    unsigned char i;
+
+    // Check if root dir
+    length = strlen(presentdir[activepane].path);
+    if (length > 3)
+    {
+        // Find last /
+        for (i = length - 2; i > 2; i--)
+        {
+            if (presentdir[activepane].path[i] == '/')
+            {
+                break;
+            }
+        }
+
+        // Set new path
+        presentdir[activepane].path[i + 1] = 0;
+
+        // Draw new dir
+        dir_draw(activepane, 1);
+    }
 }

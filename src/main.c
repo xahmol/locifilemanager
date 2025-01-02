@@ -27,6 +27,8 @@ void main()
     unsigned char len;
     activepane = 0;
     filter = 0;
+    enterchoice = 0;
+    confirm = 0;
 
     // Init
     setflags(SCREEN + NOKEYCLICK);
@@ -45,7 +47,7 @@ void main()
         pathbuffer[20] = 0;
         len = 20;
     }
-    gotoxy(39-len,0);
+    gotoxy(39 - len, 0);
     cputs(pathbuffer);
 
     // Set start dirs and print
@@ -58,10 +60,35 @@ void main()
     // Main loop
     do
     {
+        present = presentdir[activepane].present;
+        if (present)
+        {
+            dir_get_element(present);
+        }
+
         key = getkey(ijk_present);
 
         switch (key)
         {
+        case CH_ENTER:
+            // Enter: Enter directory or perfom selected action on file
+            if (presentdirelement.meta.type == 1)
+            {
+                strcpy(pathbuffer, presentdir[activepane].path);
+                strcat(pathbuffer, presentdirelement.name); 
+                strcpy(presentdir[activepane].path, pathbuffer);
+                dir_draw(activepane, 1);
+            }
+            else
+            {
+                // Perform action on file
+                if(enterchoice==0)
+                {
+                    dir_select_toggle();
+                }
+            }
+            break;
+
         case CH_ESC:
             // ESC: Application exit
             if (menu_areyousure("Exit application.") == 1)
@@ -71,18 +98,78 @@ void main()
             break;
 
         case '.':
-            // Next drive for active pane
+            // .: Next drive for active pane
             dir_get_next_drive(activepane);
             break;
 
         case ',':
-            // Previous drive for active pane
+            // ,: Previous drive for active pane
             dir_get_prev_drive(activepane);
             break;
 
         case '/':
-            // Previous drive for active pane
+            // /: Previous drive for active pane
             dir_switch_pane();
+            break;
+        
+        case '\\':
+            // \: Go to root
+            dir_gotoroot();
+            break;
+
+        case CH_CURS_LEFT:
+            // Curs Left: Go to parent directory
+            dir_parentdir();
+            break;
+
+        case CH_CURS_DOWN:
+            // Curs Down: Scroll down
+            dir_go_down();
+            break;
+
+        case CH_CURS_UP:
+            // Curs Up: Scroll up
+            dir_go_up();
+            break;
+
+        case 'd':
+            // d: Page down
+            dir_pagedown();
+            break;
+
+        case 'u':
+            // u: Page up
+            dir_pageup();
+            break;
+        
+        case 't':
+            // t: Go to top
+            dir_top();
+            break;
+
+        case 'b':
+            // b: Go to bottom
+            dir_bottom();
+            break;
+
+        case 's':
+            // s: Toggle select
+            dir_select_toggle();
+            break;
+
+        case 'a':
+            // a: Select all
+            dir_select_all(1);
+            break;
+
+        case 'n':
+            // n: Select none
+            dir_select_all(0);
+            break;
+
+        case 'i':
+            // i: Inverse selection
+            dir_select_inverse();
             break;
 
         default:

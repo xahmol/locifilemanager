@@ -20,7 +20,7 @@
     .import         popax
     .importzp       ptr1, ptr2
 
-; void __fastcall__ getcwd_xram(char* address, unsigned char len);
+; void __fastcall__ getcwd_xram(unsigned buf, unsigned char len);
 ; ----------------------------------------------------------------------
 ; Function to copy LOCI current working directory to XRAM
 ; ----------------------------------------------------------------------

@@ -10,6 +10,7 @@
 // Apapted and extended by Xander Mol, 2024
 
 #include "loci.h"
+#include "osdklib.h"
 #include <fcntl.h>
 #include <conio.h>
 
@@ -56,7 +57,7 @@ int __fastcall__ file_load(const char *file, void *dst, unsigned int count)
     return error;
 }
 
-int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char progx, unsigned char progy)
+int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char ypos)
 // Function to copy a file
 // Input:   dst - destination filename
 //          src - source filename
@@ -87,7 +88,9 @@ int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog,
         write_xram(FM_XRAM_ADDR, len, fd_dst);
         if (prog)
         {
-            cputcxy(progx, progy, progress_str[0x03 & cnt++]);
+            gotoxy(38, ypos);
+            cputc(A_FWGREEN);
+            cputc(progress_str[0x03 & cnt++]);
         }
     } while (len == FM_XRAM_SIZE);
     close(fd_src);

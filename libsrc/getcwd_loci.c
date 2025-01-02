@@ -12,7 +12,7 @@
 #include "loci.h"
 #include "osdklib.h"
 
-void __fastcall__ getcwd_loci(char *buffer, unsigned char len)
+void __fastcall__ getcwd_loci(char* buf, unsigned char len)
 // Function to copy CWD from LOCI to RAM buffer
 // Input:
 //  -   buffer: destination in RAM
@@ -20,18 +20,18 @@ void __fastcall__ getcwd_loci(char *buffer, unsigned char len)
 {
     unsigned char val;
     unsigned char count = 0;
-    char *address = FM_XRAM_ADDR;
+    unsigned address = FM_XRAM_ADDR;
 
     getcwd_xram(address, 255);
 
     while (val = xram_peek(address++), val != 0 && count < len)
     {
         count++;
-        poke(buffer++, val);
+        poke(buf++, val);
     }
 
     if (len < 255)
     {
-        buffer[len] = 0;
+        buf[len] = 0;
     }
 }
