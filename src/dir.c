@@ -785,10 +785,10 @@ void dir_bottom()
 {
     unsigned char count;
 
-    // Are there dir entries?
-    if (presentdir[activepane].firstelement)
+    // Are there dir entries? And is there a next dir entry
+    if (presentdir[activepane].firstelement && presentdirelement.meta.next)
     {
-        // Check if not already at bottom
+        // Check if not already at bottom page
         present = presentdir[activepane].lastprint;
         dir_get_element(present);
         if (!presentdirelement.meta.next)
