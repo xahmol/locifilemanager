@@ -454,7 +454,6 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
     unsigned char printpos = 0;
     unsigned element;
-    unsigned presentpos;
 
     // Clear area
     cleararea(ypos, 12);
@@ -518,6 +517,7 @@ void dir_get_next_drive(unsigned char dirnr)
     unsigned char drive = presentdir[dirnr].drive;
     unsigned char valid = 0;
 
+    // Find first next valid drive
     do
     {
         drive++;
@@ -543,11 +543,12 @@ void dir_get_next_drive(unsigned char dirnr)
 }
 
 void dir_get_prev_drive(unsigned char dirnr)
-// Get the next avaailable drive for pane
+// Get the previous avaailable drive for pane
 {
     unsigned char drive = presentdir[dirnr].drive;
     unsigned char valid = 0;
 
+    // Find first previous valid drive
     do
     {
         if (drive > 0)
@@ -587,12 +588,15 @@ void dir_switch_pane()
 void dir_go_down()
 // Scroll down in dir of active pane
 {
+    // Are there dir entries? And is there a next entry?
     if (presentdir[activepane].firstelement && presentdirelement.meta.next)
     {
         present = presentdirelement.meta.next;
         dir_get_element(present);
         presentdir[activepane].present = present;
         presentdir[activepane].position++;
+
+        // Check if next entry is on a next page. If yes, print next page
         if (presentdir[activepane].position > PANE_HEIGHT - 1)
         {
             presentdir[activepane].position = 0;
@@ -601,6 +605,7 @@ void dir_go_down()
         }
         else
         {
+            // Select next entry
             previous = presentdirelement.meta.prev;
             dir_get_element(previous);
             dir_print_entry(activepane, presentdir[activepane].position - 1);
@@ -613,17 +618,20 @@ void dir_go_down()
 void dir_go_up()
 // Scroll up in dir of active pane
 {
-    unsigned char element;
+    unsigned char count;
 
+    // Are there dir entries? And is there a previous entry?
     if (presentdir[activepane].firstelement && presentdirelement.meta.prev)
     {
         present = presentdirelement.meta.prev;
         dir_get_element(present);
         presentdir[activepane].present = present;
+
+        // Check if previous entry is on a previous page. If yes, print previous page
         if (!presentdir[activepane].position)
         {
             presentdir[activepane].position = PANE_HEIGHT - 1;
-            for (element = 0; element < 9; element++)
+            for (count = 0; count < 9; count++)
             {
                 if (!presentdirelement.meta.prev)
                 {
@@ -637,6 +645,7 @@ void dir_go_up()
         }
         else
         {
+            // Select previous entry
             presentdir[activepane].position--;
             next = presentdirelement.meta.next;
             dir_get_element(next);
@@ -647,48 +656,110 @@ void dir_go_up()
     }
 }
 
-void dir_pagedown()
-// Page down in dir of active pane
+void dir_last_of_page()
+// Go to last entry in present page
 {
-    unsigned char element;
+    unsigned element;
+    unsigned char count;
+    unsigned char position = 0;
+    unsigned char oldpos = presentdir[activepane].position;
 
-    if (presentdir[activepane].firstelement && presentdirelement.meta.next)
+    // Are there dir entries?
+    if (presentdir[activepane].firstelement)
     {
-        for (element = 0; element < PANE_HEIGHT; element++)
+        // Find last of page
+        element = presentdir[activepane].firstprint;
+        dir_get_element(element);
+        for (count = 0; count < PANE_HEIGHT - 1; count++)
         {
             if (!presentdirelement.meta.next)
             {
                 break;
             }
-            present = presentdirelement.meta.next;
-            dir_get_element(present);
+            position++;
+            element = presentdirelement.meta.next;
+            dir_get_element(element);
         }
-        presentdir[activepane].firstprint = present;
-        presentdir[activepane].present = present;
-        presentdir[activepane].position = 0;
-        dir_draw(activepane, 0);
+
+        // Set new variables and pint old and new entries in correct colour
+        presentdir[activepane].position = position;
+        dir_get_element(present);
+        dir_print_entry(activepane, oldpos);
+        presentdir[activepane].present = element;
+        present = element;
+        dir_get_element(present);
+        dir_print_entry(activepane, position);
+    }
+}
+
+void dir_pagedown()
+// Page down in dir of active pane
+{
+    unsigned element;
+    unsigned char count;
+
+    // Are there dir entries?
+    if (presentdir[activepane].firstelement)
+    {
+        element = presentdir[activepane].lastprint;
+        dir_get_element(element);
+
+        // Is there a next page?
+        if (presentdirelement.meta.next)
+        {
+            dir_get_element(present);
+            // Search how long next page is
+            for (count = 0; count < PANE_HEIGHT; count++)
+            {
+                if (!presentdirelement.meta.next)
+                {
+                    break;
+                }
+                present = presentdirelement.meta.next;
+                dir_get_element(present);
+            }
+
+            // Set new firstprint and present
+            presentdir[activepane].firstprint = present;
+            presentdir[activepane].present = present;
+            presentdir[activepane].position = 0;
+
+            // Print new page
+            dir_draw(activepane, 0);
+        }
+        else
+        {
+            // Go to boyyom
+            dir_last_of_page();
+        }
     }
 }
 
 void dir_pageup()
 // Page up in dir of active pane
 {
-    unsigned char element;
+    unsigned char count;
 
+    // Are there dir entries?
     if (presentdir[activepane].firstelement && presentdirelement.meta.prev)
     {
-        for (element = 0; element < PANE_HEIGHT; element++)
+        // Search how long previous page is
+        for (count = 0; count < PANE_HEIGHT; count++)
         {
-            if (!presentdirelement.meta.next)
+            if (!presentdirelement.meta.prev)
             {
                 break;
             }
             present = presentdirelement.meta.prev;
             dir_get_element(present);
         }
+
+        // Set new firstprint and present
         presentdir[activepane].firstprint = present;
         presentdir[activepane].present = present;
         presentdir[activepane].position = 0;
+
+        // Print new page
         dir_draw(activepane, 0);
     }
 }
@@ -696,8 +767,10 @@ void dir_pageup()
 void dir_top()
 // Go to top of dir in active pane
 {
+    // Are there dir entries?
     if (presentdir[activepane].firstelement)
     {
+        // Set present to first element and print new page
         present = presentdir[activepane].firstelement;
         dir_get_element(present);
         presentdir[activepane].present = present;
@@ -710,10 +783,20 @@ void dir_top()
 void dir_bottom()
 // Go to bottom of dir in active pane
 {
-    unsigned char element;
+    unsigned char count;
 
+    // Are there dir entries?
     if (presentdir[activepane].firstelement)
     {
+        // Check if not already at bottom
+        present = presentdir[activepane].lastprint;
+        dir_get_element(present);
+        if (!presentdirelement.meta.next)
+        {
+            dir_last_of_page();
+        }
+
+        // Find last element
         present = presentdir[activepane].firstelement;
         do
         {
@@ -727,15 +810,19 @@ void dir_bottom()
                 break;
             }
         } while (1);
+
+        // Go back one page minus one element
         presentdir[activepane].present = present;
         presentdir[activepane].position = PANE_HEIGHT - 1;
-        for (element = 0; element < PANE_HEIGHT - 1; element++)
+        for (count = 0; count < PANE_HEIGHT - 1; count++)
         {
             present = presentdirelement.meta.prev;
             dir_get_element(present);
         }
         presentdir[activepane].firstprint = present;
         present = presentdir[activepane].lastprint;
+
+        // Print new page
         dir_draw(activepane, 0);
     }
 }

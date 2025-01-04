@@ -75,6 +75,7 @@ void dir_pagedown();
 void dir_pageup();
 void dir_top();
 void dir_bottom();
+void dir_last_of_page();
 void dir_select_toggle();
 void dir_select_all(unsigned char select);
 void dir_select_inverse();

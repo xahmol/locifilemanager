@@ -12,7 +12,7 @@
 #include "loci.h"
 #include "osdklib.h"
 
-void __fastcall__ getcwd_loci(char* buf, unsigned char len)
+void __fastcall__ getcwd_loci(char *buf, unsigned char len)
 // Function to copy CWD from LOCI to RAM buffer
 // Input:
 //  -   buffer: destination in RAM
@@ -33,5 +33,9 @@ void __fastcall__ getcwd_loci(char* buf, unsigned char len)
     if (len < 255)
     {
         buf[len] = 0;
+    }
+    else
+    {
+        buf[255] = 0;
     }
 }
