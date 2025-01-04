@@ -57,7 +57,7 @@ void cleararea(unsigned char ypos, unsigned char height)
     }
 }
 
-char* truncate(const char* src, unsigned char length)
+char *truncate(const char *src, unsigned char length)
 {
     // Truncate string if too long
     if (strlen(src) > length)
@@ -295,7 +295,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                         xram_memcpy_from(bufferdir.name, workaddress, bufferdir.meta.length);
                         if (strcmp(bufferdir.name, file->d_name) > 0)
                         {
-                            if(!bufferdir.meta.prev)
+                            if (!bufferdir.meta.prev)
                             {
                                 presentdirelement.meta.prev = previous;
                                 presentdirelement.meta.next = element;
@@ -398,7 +398,7 @@ void dir_print_id_and_path(unsigned char dirnr)
     cputs(buffer);
 
     // Get rest of path and check if it fits else shorten
-    cputs(truncate(presentdir[dirnr].path + 3,35));
+    cputs(truncate(presentdir[dirnr].path + 3, 35));
 }
 
 void dir_print_entry(unsigned dirnr, unsigned char printpos)
@@ -442,7 +442,7 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
     }
 
     // Print entry data
-    sprintf(buffer, "%-32s %s", truncate(presentdirelement.name,32), dir_entry_types[presentdirelement.meta.type - 1]);
+    sprintf(buffer, "%-32s %s", truncate(presentdirelement.name, 32), dir_entry_types[presentdirelement.meta.type - 1]);
     cputs(buffer);
 }
 
@@ -453,6 +453,8 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
 {
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
     unsigned char printpos = 0;
+    unsigned element;
+    unsigned presentpos;
 
     // Clear area
     cleararea(ypos, 12);
@@ -479,16 +481,20 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
     else
     {
         // Get direlement
-        present = presentdir[dirnr].firstprint;
+        element = presentdir[dirnr].firstprint;
 
         // Loop while area is not full and further direntries are still present
         do
         {
             // Print entry and increase printpos
-            dir_get_element(present);
+            dir_get_element(element);
             dir_print_entry(dirnr, printpos);
+            presentdir[dirnr].lastprint = element;
+            if (printpos == presentdir[dirnr].position)
+            {
+                presentdir[dirnr].present = element;
+            }
             printpos++;
-            presentdir[dirnr].lastprint = present;
 
             // Check if next dir entry is present, if no: break. If yes: update present pointer
             if (!presentdirelement.meta.next)
@@ -497,14 +503,13 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
             }
             else
             {
-                present = presentdirelement.meta.next;
+                element = presentdirelement.meta.next;
             }
 
         } while (printpos < PANE_HEIGHT);
     }
 
-    present = presentdir[dirnr].firstprint;
-    dir_get_element(present);
+    present = presentdir[dirnr].present;
 }
 
 void dir_get_next_drive(unsigned char dirnr)
@@ -620,6 +625,10 @@ void dir_go_up()
             presentdir[activepane].position = PANE_HEIGHT - 1;
             for (element = 0; element < 9; element++)
             {
+                if (!presentdirelement.meta.prev)
+                {
+                    break;
+                }
                 present = presentdirelement.meta.prev;
                 dir_get_element(present);
             }
