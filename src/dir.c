@@ -37,7 +37,6 @@ char dir_entry_types[6][4] =
         "LCE",
         "   "};
 
-static const char progressBar[4] = {48, 53, 93, 95};
 char pathbuffer[256];
 char pathbuffer2[256];
 

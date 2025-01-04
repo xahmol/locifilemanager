@@ -15,7 +15,7 @@
 #include <conio.h>
 
 // Progress tracking string
-const char progress_str[] = ".oOo";
+const char progressBar[4] = {48, 53, 93, 95};
 
 int __fastcall__ file_save(const char *file, const void *src, unsigned int count)
 // Function to save a file
@@ -71,19 +71,20 @@ int __fastcall__ file_exists(const char *file)
     return 1;
 }
 
-int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char ypos)
+int file_copy(const char *dst, const char *src, unsigned char prog, unsigned char progx, unsigned char progy, unsigned char progl)
 // Function to copy a file
 // Input:   dst - destination filename
 //          src - source filename
 //          prog - enable progress indicator: 0 = no, 1 = yes
 //          progx - progress indicator x screen position
 //          progy - progress indicator y screen position
+//          progl - progress indicator length
 // Output:  error code
 {
     int fd_dst;
     int fd_src;
     int len;
-    unsigned char cnt;
+    unsigned char cnt = 0;
 
     fd_src = open(src, O_RDONLY | O_EXCL);
     if (fd_src < 0)
@@ -96,18 +97,44 @@ int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog,
         return fd_dst;
     }
 
+    // Prepare progress bar
+    if (prog)
+    {
+
+        gotoxy(progx, progy);
+        cputc(A_ALT);
+        cclear(progl);
+    }
+
     do
     {
-        len = read_xram(COPYBUF_XRAM_ADDR, COPYBUF_XRAM_SIZE, fd_src);
-        write_xram(COPYBUF_XRAM_ADDR, len, fd_dst);
         if (prog)
         {
-            gotoxy(38, ypos);
-            cputc(A_FWGREEN);
-            cputc(progress_str[0x03 & cnt++]);
+            // print progress counter
+            if ((cnt >> 2) > progl - 1)
+            {
+                cnt = 0;
+                gotoxy(progx + 1, progy);
+                cclear(progl - 1);
+            }
+            else
+            {
+                gotoxy(progx + 1 + (cnt >> 2), progy);
+                cputc(progressBar[cnt & 3]);
+                ++cnt;
+            }
         }
+
+        len = read_xram(COPYBUF_XRAM_ADDR, COPYBUF_XRAM_SIZE, fd_src);
+        write_xram(COPYBUF_XRAM_ADDR, len, fd_dst);
     } while (len == COPYBUF_XRAM_SIZE);
     close(fd_src);
     close(fd_dst);
+
+    if (prog)
+    {
+        gotoxy(progx, progy);
+        cclear(progl);
+    }
     return 0;
 }

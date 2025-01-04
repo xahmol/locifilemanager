@@ -51,6 +51,7 @@ void file_copy_selected()
         element = presentdir[activepane].firstelement;
 
         cputsxy(2, 12, "Copying file:");
+        cputsxy(2, 15, "Press ESC to cancel after next file.");
 
         do
         {
@@ -102,10 +103,19 @@ void file_copy_selected()
                 strcat(pathbuffer2, presentdirelement.name);
 
                 // Copy file
-                if (file_copy(pathbuffer, pathbuffer2, 1, 13) != 0)
+                if (file_copy(pathbuffer, pathbuffer2, 1, 2, 14, 32) != 0)
                 {
                     cputsxy(2, 14, "Error copying file.");
                     break;
+                }
+
+                // Check for pressing ESC to cancel
+                if (kbhit())
+                {
+                    if (cgetc() == CH_ESC)
+                    {
+                        break;
+                    }
                 }
             }
             element = presentdirelement.meta.next;
@@ -117,6 +127,8 @@ void file_copy_selected()
             cputsxy(2, 13, "No files selected.");
         }
 
+        gotoxy(2, 15);
+        cclear(36);
         cputsxy(2, 15, "Press key.");
         getkey(1);
 
@@ -124,7 +136,7 @@ void file_copy_selected()
 
         // Draw new dirs
         dir_draw(target, 1);
-        if(count)
+        if (count)
         {
             dir_select_all(0);
         }

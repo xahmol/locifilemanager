@@ -307,12 +307,11 @@ const char *get_loci_devname(unsigned char devid, unsigned char maxlength);
 // File operations
 #define COPYBUF_XRAM_ADDR 0x8000
 #define COPYBUF_XRAM_SIZE 0x0800
-
-extern const char progress_str[];
+extern const char progressBar[4];
 
 int __fastcall__ file_save(const char *file, const void *src, unsigned int count);
 int __fastcall__ file_load(const char *file, void *dst, unsigned int count);
-int __fastcall__ file_copy(const char *dst, const char *src, unsigned char prog, unsigned char ypos);
+int file_copy(const char *dst, const char *src, unsigned char prog, unsigned char progx, unsigned char progy, unsigned char progl);
 int __fastcall__ file_exists(const char *file);
 
 unsigned char __fastcall__ _sysrename(const char *oldpath, const char *newpath);
