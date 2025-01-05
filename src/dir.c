@@ -123,14 +123,16 @@ void dir_read(unsigned char dirnr, unsigned char filter)
     // Debug
     // unsigned char i;
 
-    // Reset dir address
+    // Reset dirdata
     presentdir[dirnr].address = (dirnr) ? DIR2BASE : DIR1BASE;
     present = presentdir[dirnr].address;
 
     // Clear directory values
     presentdir[dirnr].firstelement = 0;
     presentdir[dirnr].firstprint = 0;
+    presentdir[dirnr].lastprint = 0;
     presentdir[dirnr].position = 0;
+    presentdir[dirnr].present = 0;
 
     // Debug: Listing root dir drive 0
     // gotoxy(0,3);
@@ -364,8 +366,17 @@ void dir_read(unsigned char dirnr, unsigned char filter)
         }
     }
     closedir(dir);
-    present = presentdir[dirnr].firstelement;
-    dir_get_element(present);
+
+    if (presentdir[dirnr].firstelement)
+    {
+        present = presentdir[dirnr].firstelement;
+        dir_get_element(present);
+    }
+    else
+    {
+        present = 0;
+    }
+
     dir_print_id_and_path(dirnr);
 }
 
@@ -473,7 +484,7 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
         gotoxy(0, ypos + 2);
         cputc(A_FWRED);
         cputc(A_BGBLACK);
-        cputs("No data!");
+        cputs("Empty directory.");
     }
     // Print entries until area is filled or last item is reached
     else
@@ -505,9 +516,8 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
             }
 
         } while (printpos < PANE_HEIGHT);
+        present = presentdir[dirnr].present;
     }
-
-    present = presentdir[dirnr].present;
 }
 
 void dir_get_next_drive(unsigned char dirnr)
