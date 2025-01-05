@@ -130,7 +130,7 @@ void file_copy_selected()
         gotoxy(2, 15);
         cclear(36);
         cputsxy(2, 15, "Press key.");
-        getkey(1);
+        getkey(ijk_present);
 
         windowrestore();
 
@@ -204,7 +204,7 @@ void file_delete()
         }
 
         cputsxy(2, 15, "Press key.");
-        getkey(1);
+        getkey(ijk_present);
 
         windowrestore();
 

@@ -24,12 +24,12 @@ struct MenuBar menubar = {
     {0, 0, 0, 0, 0},
     0};
 
-char pulldown_options[PULLDOWN_NUMBER] = {5, 7, 6, 4, 2, 2, 3, 5, 4, 2};
+char pulldown_options[PULLDOWN_NUMBER] = {5, 7, 7, 7, 2, 3, 5, 4, 2};
 char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] = {
     {"Confirm:  Once  ",
      "Enter:    Select",
      "[F]ilter: None  ",
-     "S[O]rt:   Off  ",
+     "S[O]rt:   Off   ",
      "[ESC] Exit      "},
     {"[S]elect toggle ",
      "Select [A]ll    ",
@@ -43,27 +43,29 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "Page [D]own   ",
      "Page [U]p     ",
      "[T]op         ",
-     "[B]ottom      "},
-    {"[M]ount    ",
-     "[U]nmount  ",
-     "[T]arget: A",
-     "Show mounts"},
+     "[B]ottom      ",
+     "[N]ew dir     "},
+    {"[/] Switch pane",
+     "[.] Next drive ",
+     "[,] Prev drive ",
+     "[M]ount        ",
+     "[U]nmount      ",
+     "Tar[G]et: A    ",
+     "Show mounts    "},
     {"Version/credits",
      "Help           "},
-    {"Once",
-     "All "},
     {"Select",
      "Mount ",
      "Launch"},
-    {"None",
-     ".DSK",
-     ".TAP",
-     ".ROM",
-     ".LCE"},
-    {"A",
-     "B",
-     "C",
-     "D"},
+    {"None  ",
+     ".DSK  ",
+     ".TAP  ",
+     ".ROM  ",
+     ".LCE  "},
+    {"A    ",
+     "B    ",
+     "C    ",
+     "D    "},
     {"Yes",
      "No "}};
 
@@ -296,7 +298,7 @@ unsigned char menu_pulldown(unsigned char xpos, unsigned char ypos, unsigned cha
 
         do
         {
-            key = getkey(1);
+            key = getkey(ijk_present);
         } while (key != CH_ENTER && key != CH_CURS_LEFT && key != CH_CURS_RIGHT && key != CH_CURS_UP && key != CH_CURS_DOWN && key != CH_ESC && key != CH_STOP);
 
         switch (key)
@@ -386,7 +388,7 @@ unsigned char menu_main()
 
             do
             {
-                key = getkey(1);
+                key = getkey(ijk_present);
             } while (key != CH_ENTER && key != CH_CURS_LEFT && key != CH_CURS_RIGHT && key != CH_ESC && key != CH_STOP);
 
             gotoxy(menubar.xstart[menubarchoice - 1], menubar.ypos);
@@ -415,7 +417,7 @@ unsigned char menu_main()
             xpos = menubar.xstart[menubarchoice - 1];
             if (xpos + strlen(pulldown_titles[menubarchoice - 1][0]) > 36)
             {
-                xpos = 37 - strlen(pulldown_titles[menubarchoice - 1][0]);
+                xpos = 36 - strlen(pulldown_titles[menubarchoice - 1][0]);
             }
             menuoptionchoice = menu_pulldown(xpos, menubar.ypos + 1, menubarchoice - 1, 1);
             if (menuoptionchoice == 18)
@@ -473,7 +475,7 @@ void menu_fileerrormessage(int error)
     cprintf("%4X", error);
 
     cputsxy(7, 13, "Press key.");
-    getkey(1);
+    getkey(ijk_present);
 
     windowrestore();
 }
@@ -487,7 +489,7 @@ void menu_messagepopup(const char *message)
     cputsxy(7, 9, message);
 
     cputsxy(7, 11, "Press key.");
-    getkey(1);
+    getkey(ijk_present);
 
     windowrestore();
 }

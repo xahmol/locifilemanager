@@ -54,6 +54,7 @@ extern unsigned char filter;
 extern unsigned char enterchoice;
 extern unsigned char confirm;
 extern unsigned char sort;
+extern unsigned char targetdrive;
 extern char pathbuffer[256];
 extern char pathbuffer2[256];
 

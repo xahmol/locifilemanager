@@ -26,6 +26,7 @@ unsigned char filter;
 unsigned char enterchoice;
 unsigned char confirm;
 unsigned char sort;
+unsigned char targetdrive;
 char *diraddress[2] = {(char *)DIR1BASE, (char *)DIR2BASE};
 
 char dir_entry_types[6][4] =
@@ -257,9 +258,12 @@ void dir_read(unsigned char dirnr, unsigned char filter)
         }
 
         // Filter out non-matching file types if filter is set
-        if (filter && presenttype > 1 && presenttype != (filter - 1))
+        if (filter && presenttype > 1)
         {
-            presenttype = 0;
+            if (presenttype != filter + 1)
+            {
+                presenttype = 0;
+            }
         }
 
         // Debug
@@ -803,6 +807,7 @@ void dir_bottom()
         if (!presentdirelement.meta.next)
         {
             dir_last_of_page();
+            return;
         }
 
         // Find last element
@@ -937,11 +942,11 @@ void dir_togglesort()
     dir_draw(activepane, 1);
     if (sort)
     {
-        strcpy(buffer, "On  ");
+        strcpy(buffer, "On   ");
     }
     else
     {
-        strcpy(buffer, "Off  ");
+        strcpy(buffer, "Off   ");
     }
     strcpy(pulldown_titles[0][3] + 10, buffer);
 }
