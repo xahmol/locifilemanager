@@ -981,11 +981,11 @@ void dir_togglesort()
     dir_draw(1, 1);
     if (sort)
     {
-        strcpy(buffer, "On   ");
+        strcpy(buffer, "On    ");
     }
     else
     {
-        strcpy(buffer, "Off   ");
+        strcpy(buffer, "Off    ");
     }
     strcpy(pulldown_titles[0][3] + 10, buffer);
 }

@@ -111,11 +111,11 @@ int file_copy(const char *dst, const char *src, unsigned char prog, unsigned cha
         if (prog)
         {
             // print progress counter
-            if ((cnt >> 2) > progl - 1)
+            if ((cnt >> 2) > progl - 2)
             {
                 cnt = 0;
                 gotoxy(progx + 1, progy);
-                cclear(progl - 1);
+                cclear(progl-1);
             }
             else
             {
