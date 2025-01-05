@@ -882,7 +882,7 @@ void dir_bottom()
 void dir_select_toggle()
 // Toggle selection of active entry
 {
-    if (presentdirelement.meta.type > 1)
+    if (presentdir[activepane].firstelement && presentdirelement.meta.type > 1)
     {
         presentdirelement.meta.select = !presentdirelement.meta.select;
         dir_save_element(present);

@@ -305,7 +305,7 @@ void main()
 
         case CH_ENTER:
             // Enter: Enter directory or perfom selected action on file
-            if (presentdirelement.meta.type == 1)
+            if (presentdir[activepane].firstelement && presentdirelement.meta.type == 1)
             {
                 strcpy(pathbuffer, presentdir[activepane].path);
                 strcat(pathbuffer, presentdirelement.name);
