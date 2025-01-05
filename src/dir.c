@@ -107,6 +107,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
     unsigned element;
     struct DirElement bufferdir;
     unsigned workaddress;
+    unsigned char inserted;
 
     // Set colors based on whether pane is active or not
     bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
@@ -278,6 +279,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
             }
 
             // Set direntry pointers
+            // Is this the first entry?
             if (!previous)
             {
                 presentdir[dirnr].firstelement = present;
@@ -286,43 +288,79 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                 previous = present;
                 presentdirelement.meta.next = 0;
             }
+            // All next entries
             else
             {
+                // Does the list need to be sorted?
                 if (sort)
                 {
+                    inserted = 0;
                     // Find element to insert after
                     element = presentdir[dirnr].firstelement;
-                    while (element)
+                    do
                     {
                         workaddress = element;
                         xram_memcpy_from(&bufferdir.meta, workaddress, sizeof(bufferdir.meta));
                         workaddress += sizeof(bufferdir.meta);
                         xram_memcpy_from(bufferdir.name, workaddress, bufferdir.meta.length);
+
+                        // Debug
+                        // cleararea((activepane)?5:17, 10);
+                        // gotoxy(0,(activepane)?5:17);
+                        // cprintf("Element: %4x Present: %4x\n\r", element, present);
+                        // cprintf("To insert:\n\r%s\n\r", file->d_name);
+                        // cprintf("Compare with:"
+                        //       "\n\r%s\n\r",
+                        //       bufferdir.name);
+
                         if (strcmp(bufferdir.name, file->d_name) > 0)
                         {
+                            // Insert before the first one?
                             if (!bufferdir.meta.prev)
                             {
-                                presentdirelement.meta.prev = previous;
+                                presentdirelement.meta.prev = 0;
                                 presentdirelement.meta.next = element;
                                 bufferdir.meta.prev = present;
                                 presentdir[dirnr].firstelement = present;
+                                presentdir[dirnr].firstprint = present;
                                 xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
+
+                                // cprintf("Insert before first.\n\r");
+                                // cprintf("Prev: %4x Next: %4x BuffPrev: %4x\n\r", presentdirelement.meta.prev, presentdirelement.meta.next, bufferdir.meta.prev);
                             }
                             else
+                            // Insert in between
                             {
                                 presentdirelement.meta.prev = bufferdir.meta.prev;
                                 presentdirelement.meta.next = element;
                                 bufferdir.meta.prev = present;
                                 xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
+
+                                // cprintf("Insert in betweent.\n\r");
+                                // cprintf("Prev: %4x Next: %4x BuffNPrev: %4x ", presentdirelement.meta.prev, presentdirelement.meta.next, bufferdir.meta.prev);
+
                                 xram_memcpy_from(&bufferdir.meta, presentdirelement.meta.prev, sizeof(bufferdir.meta));
                                 bufferdir.meta.next = present;
+                                // cprintf("BuffPNext: %4x\n\r", bufferdir.meta.next);
                                 xram_memcpy_to(presentdirelement.meta.prev, &bufferdir.meta, sizeof(bufferdir.meta));
                             }
+                            inserted = 1;
                             break;
                         }
-                        element = presentdirelement.meta.next;
-                        previous = element;
+                        element = bufferdir.meta.next;
+                    } while (element);
+
+                    // Insert at the ned
+                    if (!inserted)
+                    {
+                        // cprintf("Insert at the end.\n\r");
+
+                        presentdirelement.meta.prev = previous;              // Set prev in new entry
+                        xram_memcpy_to(previous, &present, sizeof(present)); // Set next in previous entry
+                        previous = present;
+                        presentdirelement.meta.next = 0;
                     }
+                    // cgetc();
                 }
                 else
                 {
@@ -939,7 +977,8 @@ void dir_togglesort()
 // Toggle sort order of active pane
 {
     sort = !sort;
-    dir_draw(activepane, 1);
+    dir_draw(0, 1);
+    dir_draw(1, 1);
     if (sort)
     {
         strcpy(buffer, "On   ");
