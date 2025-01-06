@@ -11,6 +11,7 @@
 #include "loci.h"
 #include "defines.h"
 #include "menu.h"
+#include "dir.h"
 
 // Variables
 // Windows
@@ -152,6 +153,150 @@ unsigned char getkey(unsigned char joyallowed)
         }
     } while (key == 0);
     return key;
+}
+
+signed int textInput(unsigned char xpos, unsigned char ypos, unsigned char width, char *str, unsigned char size, unsigned char validation)
+{
+
+    /**
+     * input/modify a string.
+     * based on version DraCopy 1.0e, then modified.
+     * Created 2009 by Sascha Bader.
+     * @param[in] xpos screen x where input starts.
+     * @param[in] ypos screen y where input starts.
+     * @param[in,out] str string that is edited, it can have content and must have at least @p size + 1 bytes. Maximum size     if 255 bytes.
+     * @param[in] size maximum length of @p str in bytes.
+     * @return -1 if input was aborted.
+     * @return >= 0 length of edited string @p str.
+     */
+    // Added input: Validation  =   0   All printable characters allowed
+    //                          +   1   Numbers allowed only
+    //                          +   2   Also alphabet allowed (lower and uppercase)
+    //                          +   4   Also wildcards * and ? allowed
+    //                          Add numbers to combine or 0 for no validation
+    //              width:      =   width of input viewport, can be less than size
+
+    unsigned char c;
+    unsigned char idx = strlen(str);
+    unsigned char len;
+    unsigned char valid = 0;
+    unsigned char offs = 0;
+
+    // Loop for input from keyboard
+    while (1)
+    {
+        // Print present string and cursor
+        if (idx + 1 > width)
+        {
+            offs = idx + 1 - width;
+        }
+        if (idx + 1 == width)
+        {
+            offs = 0;
+        }
+        len = strlen(str);
+
+        gotoxy(xpos, ypos);
+
+        if (idx)
+        {
+            cputs(truncate(str + offs, idx - offs));
+        }
+        cputc(str[idx] ? 128 + str[idx] : CH_INVSPACE);
+        if (!offs && width > idx + 1)
+        {
+            cputs(truncate(str + idx + 1, width - idx - 1));
+        }
+        if (len < width)
+        {
+            cclear(width - len - 1);
+        }
+
+        // Get key value
+        c = getkey(ijk_present);
+
+        // Do action based on key pressed
+        switch (c)
+        {
+        case CH_ESC:
+            // ESC: Cancel input and return -1
+            return -1;
+
+        case CH_ENTER:
+            // ENTER: Finish input and returns length plus changed string
+            gotoxy(xpos, ypos);
+            cclear(width);
+            cputsxy(xpos, ypos, truncate(str, width));
+            return len;
+
+        case CH_DEL:
+            // DEL: Delete prev char
+            if (idx)
+            {
+                --idx;
+                for (c = idx; 1; ++c)
+                {
+                    unsigned char b = str[c + 1];
+                    str[c] = b;
+                    if (b == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            break;
+
+        case CH_CURS_LEFT:
+            if (idx)
+            {
+                --idx;
+            }
+            break;
+
+        case CH_CURS_RIGHT:
+            if (idx < strlen(str) && idx < size)
+            {
+                ++idx;
+            }
+            break;
+
+        default:
+            valid = 0;
+            if (!validation)
+            {
+                valid = 1;
+            }
+            if ((validation & 1) && c > 47 && c < 58)
+            {
+                valid = 1;
+            }
+            if ((validation & 2) && c > 64 && c < 91)
+            {
+                valid = 1;
+            }
+            if ((validation & 2) && c > 96 && c < 123)
+            {
+                valid = 1;
+            }
+            if ((validation & 4) && (c == 42 || c == 63))
+            {
+                valid = 1;
+            }
+            if (isprint(c) && idx < size && valid)
+            {
+                unsigned char flag = (str[idx] == 0);
+                str[idx] = c;
+                if (flag)
+                {
+                    str[idx + 1] = 0;
+                }
+                idx++;
+                break;
+            }
+            break;
+        }
+    }
+    return 0;
 }
 
 // Windows

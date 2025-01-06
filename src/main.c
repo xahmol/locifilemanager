@@ -266,6 +266,15 @@ void main()
     get_locicfg();
     ijk_detect();
 
+    // Testing input
+    //cputsxy(2,1,"012345678901234567890123456789012345");
+    //strcpy(pathbuffer,"0123456789");
+    //textInput(2,2,35,pathbuffer,64,0);
+    //strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
+    //textInput(2,3,35,pathbuffer,64,0);
+    //cgetc();
+    //clrscr();
+
     // Place header and menubar
     menu_placetop("LOCI File Manager");
     sprintf(pathbuffer, "%s FW %s", locicfg.uname.sysname, locicfg.uname.release);
