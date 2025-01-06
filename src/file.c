@@ -41,6 +41,12 @@ void file_copy_selected()
     unsigned element;
     unsigned char roomleft = 255 - strlen(presentdir[target].path);
 
+    if (!strcmp(presentdir[target].path, presentdir[activepane].path))
+    {
+        menu_messagepopup("Target dir same as active dir.");
+        return;
+    }
+
     if (presentdir[activepane].firstelement)
     {
         windownew(0, 8, 15);
