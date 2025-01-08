@@ -180,7 +180,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
             if (datalength < 64)
             {
                 datalength++;
-                strcat(file->d_name,"/");
+                strcat(file->d_name, "/");
             }
         }
 
@@ -298,7 +298,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                         //       "\n\r%s\n\r",
                         //       bufferdir.name);
 
-                        if (strcmp(bufferdir.name, file->d_name) > 0)
+                        if (strncmp(bufferdir.name, file->d_name, 32) > 0)
                         {
                             // Insert before the first one?
                             if (!bufferdir.meta.prev)
@@ -435,7 +435,7 @@ void dir_print_id_and_path(unsigned char dirnr)
     cputs(buffer);
 
     // Get rest of path and check if it fits else shorten
-    cprintf("%.35s",presentdir[dirnr].path + 3);
+    cprintf("%.35s", presentdir[dirnr].path + 3);
 }
 
 void dir_print_entry(unsigned dirnr, unsigned char printpos)
@@ -466,7 +466,7 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
     cputc(fg_color);
     cputc(bg_color);
     cclear(38);
-    gotoxy(2,ypos);
+    gotoxy(2, ypos);
 
     // Print '-'indicator if selected
     if (presentdirelement.meta.select)
@@ -480,7 +480,7 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
 
     // Print entry data
     sprintf(buffer, "%.32s", presentdirelement.name, 32);
-    cprintf("%-32s %.3s",buffer, dir_entry_types[presentdirelement.meta.type - 1]);
+    cprintf("%-32s %.3s", buffer, dir_entry_types[presentdirelement.meta.type - 1]);
 }
 
 void dir_draw(unsigned char dirnr, unsigned char readdir)
@@ -571,8 +571,8 @@ void dir_get_next_drive(unsigned char dirnr)
     presentdir[dirnr].drive = drive;
 
     // Set root as path
-    sprintf(buffer, "%u:/", presentdir[dirnr].drive);
-    strcpy(presentdir[dirnr].path, buffer);
+    sprintf(buffer, "%1u:/", presentdir[dirnr].drive);
+    strncpy(presentdir[dirnr].path, buffer, 4);
 
     // Draw new dir
     dir_draw(dirnr, 1);
@@ -606,8 +606,8 @@ void dir_get_prev_drive(unsigned char dirnr)
     presentdir[dirnr].drive = drive;
 
     // Set root as path
-    sprintf(buffer, "%u:/", presentdir[dirnr].drive);
-    strcpy(presentdir[dirnr].path, buffer);
+    sprintf(buffer, "%1u:/", presentdir[dirnr].drive);
+    strncpy(presentdir[dirnr].path, buffer, 4);
 
     // Draw new dir
     dir_draw(dirnr, 1);
@@ -924,8 +924,8 @@ void dir_gotoroot()
 // Go to root of active pane
 {
     // Set root as path
-    sprintf(pathbuffer, "%u:/", presentdir[activepane].drive);
-    strcpy(presentdir[activepane].path, pathbuffer);
+    sprintf(buffer, "%1u:/", presentdir[activepane].drive);
+    strncpy(presentdir[activepane].path, buffer, 4);
 
     // Draw new dir
     dir_draw(activepane, 1);
@@ -972,5 +972,5 @@ void dir_togglesort()
     {
         strcpy(buffer, "Off    ");
     }
-    strcpy(pulldown_titles[0][3] + 10, buffer);
+    strncpy(pulldown_titles[0][3] + 10, buffer, PULLDOWN_MAXLENGTH - 10);
 }

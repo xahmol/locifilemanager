@@ -43,7 +43,7 @@ void confirm_toggle()
     {
         strcpy(buffer, "Once  ");
     }
-    strcpy(pulldown_titles[0][0] + 10, buffer);
+    strncpy(pulldown_titles[0][0] + 10, buffer, PULLDOWN_MAXLENGTH - 10);
 }
 
 void select_enter_choice()
@@ -56,7 +56,7 @@ void select_enter_choice()
     if (select)
     {
         enterchoice = select - 1;
-        strcpy(pulldown_titles[0][1] + 10, pulldown_titles[5][enterchoice]);
+        strncpy(pulldown_titles[0][1] + 10, pulldown_titles[5][enterchoice], PULLDOWN_MAXLENGTH - 10);
     }
 }
 
@@ -70,7 +70,7 @@ void select_filter()
     if (select)
     {
         filter = select - 1;
-        strcpy(pulldown_titles[0][2] + 10, pulldown_titles[6][filter]);
+        strncpy(pulldown_titles[0][2] + 10, pulldown_titles[6][filter], PULLDOWN_MAXLENGTH - 10);
         dir_draw(0, 1);
         dir_draw(1, 1);
     }
@@ -86,7 +86,7 @@ void select_targetdrive()
     if (select)
     {
         targetdrive = select - 1;
-        strcpy(pulldown_titles[3][5] + 10, pulldown_titles[7][targetdrive]);
+        strncpy(pulldown_titles[3][5] + 10, pulldown_titles[7][targetdrive], PULLDOWN_MAXLENGTH - 10);
     }
 }
 
@@ -317,9 +317,9 @@ void main()
             // Enter: Enter directory or perfom selected action on file
             if (presentdir[activepane].firstelement && presentdirelement.meta.type == 1)
             {
-                strcpy(pathbuffer, presentdir[activepane].path);
-                strcat(pathbuffer, presentdirelement.name);
-                strcpy(presentdir[activepane].path, pathbuffer);
+                strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));
+                strncat(pathbuffer, presentdirelement.name, sizeof(pathbuffer) - strlen(pathbuffer));
+                strncpy(presentdir[activepane].path, pathbuffer, sizeof(presentdir[activepane].path));
                 dir_draw(activepane, 1);
             }
             else

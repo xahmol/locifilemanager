@@ -31,7 +31,11 @@ DIR *__fastcall__ opendir(register const char *name)
     }
     ret = mia_call_int_errno(MIA_OP_OPENDIR);
     d.fd = ret;
-    strcpy(d.name, name);
+
+    // Copy string buffer overflow safe and esnure trailing zero
+    strncpy(d.name, name, sizeof(d.name));
+    d.name[256] = 0;
+
     d.off = 0;
     return &d;
 }

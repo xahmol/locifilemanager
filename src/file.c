@@ -26,8 +26,8 @@ unsigned char file_confirm_message(const char *message, const char *file)
     windownew(0, 14, 9);
     cputsxy(2, 16, message);
     cputsxy(2, 18, "File:");
-    gotoxy(2,19);
-    cprintf("%.30s",file);
+    gotoxy(2, 19);
+    cprintf("%.30s", file);
     choice = menu_pulldown(10, 20, MENU_YESNO, 0);
     windowrestore();
     return (choice == 1) ? 1 : 0;
@@ -53,8 +53,8 @@ void file_copy_selected()
         windownew(0, 8, 15);
 
         cputsxy(2, 9, "Copy files to:");
-        gotoxy(2,10);
-        cprintf("%.35s",presentdir[target].path);
+        gotoxy(2, 10);
+        cprintf("%.35s", presentdir[target].path);
 
         element = presentdir[activepane].firstelement;
 
@@ -71,8 +71,8 @@ void file_copy_selected()
                 count++;
                 gotoxy(2, 13);
                 cclear(34);
-                gotoxy(2,13);
-                cprintf("%.35s",presentdirelement.name);
+                gotoxy(2, 13);
+                cprintf("%.35s", presentdirelement.name);
 
                 // Check if path gets too long
                 if (roomleft < strlen(presentdirelement.name))
@@ -82,8 +82,8 @@ void file_copy_selected()
                 }
 
                 // Derive full target path
-                strcpy(pathbuffer, presentdir[target].path);
-                strcat(pathbuffer, presentdirelement.name);
+                strncpy(pathbuffer, presentdir[target].path, sizeof(pathbuffer));
+                strncat(pathbuffer, presentdirelement.name, sizeof(pathbuffer) - strlen(pathbuffer));
 
                 // Check if file exists
                 if (file_exists(pathbuffer))
@@ -108,8 +108,8 @@ void file_copy_selected()
                 }
 
                 // Derive full source path
-                strcpy(pathbuffer2, presentdir[activepane].path);
-                strcat(pathbuffer2, presentdirelement.name);
+                strncpy(pathbuffer2, presentdir[activepane].path, sizeof(pathbuffer2));
+                strncat(pathbuffer2, presentdirelement.name, sizeof(pathbuffer2) - strlen(pathbuffer2));
 
                 // Copy file
                 if (file_copy(pathbuffer, pathbuffer2, 1, 2, 14, 32) != 0)
@@ -177,8 +177,8 @@ void file_delete()
                 count++;
                 gotoxy(2, 11);
                 cclear(34);
-                gotoxy(2,11);
-                cprintf("%.35s",presentdirelement.name);
+                gotoxy(2, 11);
+                cprintf("%.35s", presentdirelement.name);
 
                 // Confirm delete
                 if (confirm || !confirmed)
@@ -194,8 +194,8 @@ void file_delete()
                 }
 
                 // Derive full target path
-                strcpy(pathbuffer, presentdir[activepane].path);
-                strcat(pathbuffer, presentdirelement.name);
+                strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));
+                strncat(pathbuffer, presentdirelement.name, sizeof(pathbuffer) - strlen(pathbuffer));
 
                 // Delete file
                 if (_sysremove(pathbuffer) != 0)
@@ -226,7 +226,7 @@ void file_delete()
 void file_rename()
 // Function to rename selected file or dir
 {
-    char input[65];
+    char input[64];
 
     if (presentdir[activepane].firstelement)
     {
@@ -234,7 +234,7 @@ void file_rename()
 
         cputsxy(2, 9, "Rename file.");
 
-        strcpy(input, presentdirelement.name);
+        strncpy(input, presentdirelement.name, 65);
 
         // Is it a directory? Then remove trailing /
         if (presentdirelement.meta.type == 1)
@@ -243,8 +243,8 @@ void file_rename()
         }
 
         // Set old name full path
-        strcpy(pathbuffer, presentdir[activepane].path);
-        strcat(pathbuffer, input);
+        strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));
+        strncat(pathbuffer, input, sizeof(pathbuffer) - strlen(pathbuffer));
 
         cputsxy(2, 11, "Enter new name:");
 
@@ -255,8 +255,8 @@ void file_rename()
             if (!strcmp(input, presentdirelement.name))
             {
                 // Set new name full path
-                strcpy(pathbuffer2, presentdir[activepane].path);
-                strcat(pathbuffer2, input);
+                strncpy(pathbuffer2, presentdir[activepane].path, sizeof(pathbuffer2));
+                strncat(pathbuffer2, input, sizeof(pathbuffer2) - strlen(pathbuffer2));
 
                 // Rename
                 if (_sysrename(pathbuffer, pathbuffer2))
