@@ -26,7 +26,8 @@ unsigned char file_confirm_message(const char *message, const char *file)
     windownew(0, 14, 9);
     cputsxy(2, 16, message);
     cputsxy(2, 18, "File:");
-    cputsxy(2, 19, truncate(file, 30));
+    gotoxy(2,19);
+    cprintf("%.30s",file);
     choice = menu_pulldown(10, 20, MENU_YESNO, 0);
     windowrestore();
     return (choice == 1) ? 1 : 0;
@@ -52,7 +53,8 @@ void file_copy_selected()
         windownew(0, 8, 15);
 
         cputsxy(2, 9, "Copy files to:");
-        cputsxy(2, 10, truncate(presentdir[target].path, 35));
+        gotoxy(2,10);
+        cprintf("%.35s",presentdir[target].path);
 
         element = presentdir[activepane].firstelement;
 
@@ -69,7 +71,8 @@ void file_copy_selected()
                 count++;
                 gotoxy(2, 13);
                 cclear(34);
-                cputsxy(2, 13, truncate(presentdirelement.name, 34));
+                gotoxy(2,13);
+                cprintf("%.35s",presentdirelement.name);
 
                 // Check if path gets too long
                 if (roomleft < strlen(presentdirelement.name))
@@ -174,7 +177,8 @@ void file_delete()
                 count++;
                 gotoxy(2, 11);
                 cclear(34);
-                cputsxy(2, 11, truncate(presentdirelement.name, 34));
+                gotoxy(2,11);
+                cprintf("%.35s",presentdirelement.name);
 
                 // Confirm delete
                 if (confirm || !confirmed)
@@ -216,5 +220,63 @@ void file_delete()
 
         // Draw new dirs
         dir_draw(activepane, 1);
+    }
+}
+
+void file_rename()
+// Function to rename selected file or dir
+{
+    char input[65];
+
+    if (presentdir[activepane].firstelement)
+    {
+        windownew(0, 8, 15);
+
+        cputsxy(2, 9, "Rename file.");
+
+        strcpy(input, presentdirelement.name);
+
+        // Is it a directory? Then remove trailing /
+        if (presentdirelement.meta.type == 1)
+        {
+            input[strlen(input) - 1] = 0;
+        }
+
+        // Set old name full path
+        strcpy(pathbuffer, presentdir[activepane].path);
+        strcat(pathbuffer, input);
+
+        cputsxy(2, 11, "Enter new name:");
+
+        // Input new name and check if not cancelled or empty string
+        if (textInput(2, 12, 35, input, 64, 0) > 0)
+        {
+            // Check if name is actually altered
+            if (!strcmp(input, presentdirelement.name))
+            {
+                // Set new name full path
+                strcpy(pathbuffer2, presentdir[activepane].path);
+                strcat(pathbuffer2, input);
+
+                // Rename
+                if (_sysrename(pathbuffer, pathbuffer2))
+                {
+                    // Print error message
+                    cputsxy(2, 14, "Rename failed. Prsss key.");
+                    getkey(ijk_present);
+                    windowrestore();
+                    return;
+                }
+                else
+                {
+                    // Redraw dir.
+                    // Neceasary as name length can be changed, so all address need to be changed.
+                    windowrestore();
+                    dir_draw(activepane, 1);
+                    return;
+                }
+            }
+        }
+        windowrestore();
     }
 }

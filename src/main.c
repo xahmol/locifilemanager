@@ -168,6 +168,7 @@ void mainmenuloop()
             break;
 
         case 26:
+            file_rename();
             break;
 
         case 27:
@@ -267,13 +268,13 @@ void main()
     ijk_detect();
 
     // Testing input
-    //cputsxy(2,1,"012345678901234567890123456789012345");
-    //strcpy(pathbuffer,"0123456789");
-    //textInput(2,2,35,pathbuffer,64,0);
-    //strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
-    //textInput(2,3,35,pathbuffer,64,0);
-    //cgetc();
-    //clrscr();
+    // cputsxy(2,1,"012345678901234567890123456789012345");
+    // strcpy(pathbuffer,"0123456789");
+    // textInput(2,2,35,pathbuffer,64,0);
+    // strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
+    // textInput(2,3,35,pathbuffer,64,0);
+    // cgetc();
+    // clrscr();
 
     // Place header and menubar
     menu_placetop("LOCI File Manager");
@@ -307,7 +308,7 @@ void main()
 
         switch (key)
         {
-        case ']':
+        case CH_CURS_RIGHT:
             // Go to menu
             mainmenuloop();
             break;
@@ -432,6 +433,11 @@ void main()
         case 'g':
             // g: select target drive
             select_targetdrive();
+            break;
+
+        case 'r':
+            // r: Rename
+            file_rename();
             break;
 
         case CH_DEL:

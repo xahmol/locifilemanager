@@ -57,22 +57,6 @@ void cleararea(unsigned char ypos, unsigned char height)
     }
 }
 
-char *truncate(const char *src, unsigned char length)
-{
-    // Truncate string if too long
-    if (strlen(src) > length)
-    {
-        strncpy(pathbuffer2, src, length);
-        pathbuffer2[length] = 0;
-    }
-    else
-    {
-        strcpy(pathbuffer2, src);
-    }
-
-    return pathbuffer2;
-}
-
 void dir_get_element(unsigned address)
 // Get directory element from address
 // Input: address = address of element
@@ -195,7 +179,8 @@ void dir_read(unsigned char dirnr, unsigned char filter)
             // Add / to dir name if room is left
             if (datalength < 64)
             {
-                file->d_name[datalength++] = '/';
+                datalength++;
+                strcat(file->d_name,"/");
             }
         }
 
@@ -450,7 +435,7 @@ void dir_print_id_and_path(unsigned char dirnr)
     cputs(buffer);
 
     // Get rest of path and check if it fits else shorten
-    cputs(truncate(presentdir[dirnr].path + 3, 35));
+    cprintf("%.35s",presentdir[dirnr].path + 3);
 }
 
 void dir_print_entry(unsigned dirnr, unsigned char printpos)
@@ -478,10 +463,10 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
 
     // Clear area
     gotoxy(0, ypos);
-
     cputc(fg_color);
     cputc(bg_color);
     cclear(38);
+    gotoxy(2,ypos);
 
     // Print '-'indicator if selected
     if (presentdirelement.meta.select)
@@ -494,8 +479,8 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
     }
 
     // Print entry data
-    sprintf(buffer, "%-32s %s", truncate(presentdirelement.name, 32), dir_entry_types[presentdirelement.meta.type - 1]);
-    cputs(buffer);
+    sprintf(buffer, "%.32s", presentdirelement.name, 32);
+    cprintf("%-32s %.3s",buffer, dir_entry_types[presentdirelement.meta.type - 1]);
 }
 
 void dir_draw(unsigned char dirnr, unsigned char readdir)

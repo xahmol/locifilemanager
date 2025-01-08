@@ -185,32 +185,24 @@ signed int textInput(unsigned char xpos, unsigned char ypos, unsigned char width
     // Loop for input from keyboard
     while (1)
     {
-        // Print present string and cursor
-        if (idx + 1 > width)
+        // Calculate offset for viewing long string in viewport based on cursor pos
+        if (idx + 2 > width)
         {
-            offs = idx + 1 - width;
-        }
-        if (idx + 1 == width)
-        {
-            offs = 0;
+            offs = idx + 2 - width;
         }
         len = strlen(str);
 
+        // Clear viewport
         gotoxy(xpos, ypos);
+        cclear(width);
 
-        if (idx)
-        {
-            cputs(truncate(str + offs, idx - offs));
-        }
-        cputc(str[idx] ? 128 + str[idx] : CH_INVSPACE);
-        if (!offs && width > idx + 1)
-        {
-            cputs(truncate(str + idx + 1, width - idx - 1));
-        }
-        if (len < width)
-        {
-            cclear(width - len - 1);
-        }
+        // Print viweable part of string
+        gotoxy(xpos, ypos);
+        cprintf("%.*s", width - 1, str + offs);
+
+        // Print cursor
+        gotoxy(xpos + idx - offs, ypos);
+        cputc((str[idx] ? 128 + str[idx] : CH_INVSPACE));
 
         // Get key value
         c = getkey(ijk_present);
@@ -226,7 +218,8 @@ signed int textInput(unsigned char xpos, unsigned char ypos, unsigned char width
             // ENTER: Finish input and returns length plus changed string
             gotoxy(xpos, ypos);
             cclear(width);
-            cputsxy(xpos, ypos, truncate(str, width));
+            gotoxy(xpos, ypos);
+            cprintf("%.*s", width - 1, str);
             return len;
 
         case CH_DEL:
