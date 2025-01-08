@@ -10,6 +10,7 @@
 #include "osdklib.h"
 #include "loci.h"
 #include "defines.h"
+#include "generic.h"
 #include "menu.h"
 #include "dir.h"
 #include "file.h"
@@ -252,7 +253,7 @@ void file_rename()
         if (textInput(2, 12, 35, input, 64, 0) > 0)
         {
             // Check if name is actually altered
-            if (!strcmp(input, presentdirelement.name))
+            if (strcmp(input, presentdirelement.name))
             {
                 // Set new name full path
                 strncpy(pathbuffer2, presentdir[activepane].path, sizeof(pathbuffer2));

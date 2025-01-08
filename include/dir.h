@@ -59,7 +59,6 @@ extern char pathbuffer[256];
 extern char pathbuffer2[256];
 
 // Function prototypes
-void cleararea(unsigned char ypos, unsigned char height);
 void dir_get_element(unsigned address);
 void dir_save_element(unsigned address);
 void dir_read(unsigned char dirnr, unsigned char filter);

@@ -15,11 +15,6 @@
 #define MENU_YESNO 8          // Number for Yes No pull down menu
 
 // Function prototypes
-// Generic functions
-void wait(unsigned int wait_cycles);
-unsigned char getkey(unsigned char joyallowed);
-signed int textInput(unsigned char xpos, unsigned char ypos, unsigned char width, char* str, unsigned char size,unsigned char validation);
-
 // Windows
 void windowsave(unsigned char ypos, unsigned char height);
 void windowrestore();

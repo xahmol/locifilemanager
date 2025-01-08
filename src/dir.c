@@ -10,6 +10,7 @@
 #include "osdklib.h"
 #include "loci.h"
 #include "defines.h"
+#include "generic.h"
 #include "menu.h"
 #include "dir.h"
 
@@ -42,21 +43,6 @@ char pathbuffer[256];
 char pathbuffer2[256];
 
 // Functions
-void cleararea(unsigned char ypos, unsigned char height)
-//  Clear an area of the screen
-//  Input: ypos = startline of area
-//         height = height of area
-{
-    unsigned char y;
-    for (y = 0; y < height; y++)
-    {
-        gotoxy(0, ypos + y);
-        cputc(A_FWWHITE);
-        cputc(A_BGBLACK);
-        cclear(38);
-    }
-}
-
 void dir_get_element(unsigned address)
 // Get directory element from address
 // Input: address = address of element

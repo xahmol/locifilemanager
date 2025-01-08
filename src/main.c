@@ -10,6 +10,7 @@
 #include "osdklib.h"
 #include "loci.h"
 #include "defines.h"
+#include "generic.h"
 #include "menu.h"
 #include "dir.h"
 #include "file.h"
@@ -268,13 +269,15 @@ void main()
     ijk_detect();
 
     // Testing input
-    // cputsxy(2,1,"012345678901234567890123456789012345");
-    // strcpy(pathbuffer,"0123456789");
-    // textInput(2,2,35,pathbuffer,64,0);
-    // strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
-    // textInput(2,3,35,pathbuffer,64,0);
-    // cgetc();
-    // clrscr();
+    //cputsxy(2,4,"012345678901234567890123456789012345");
+    //strcpy(pathbuffer,"0123456789");
+    //textInput(2,5,35,pathbuffer,64,0);
+    //strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
+    //textInput(2,6,35,pathbuffer,64,0);
+    //gotoxy(2,7);
+    //cputs(pathbuffer);
+    //cgetc();
+    //clrscr();
 
     // Place header and menubar
     menu_placetop("LOCI File Manager");
