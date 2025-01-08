@@ -14,6 +14,7 @@
 #include "menu.h"
 #include "dir.h"
 #include "file.h"
+#include "drive.h"
 
 // Global variables
 char buffer[41];
@@ -216,6 +217,7 @@ void mainmenuloop()
             break;
 
         case 44:
+            drive_mount();
             break;
 
         case 45:
@@ -226,6 +228,7 @@ void mainmenuloop()
             break;
 
         case 47:
+            drive_showmounts();
             break;
 
         case 51:
@@ -268,16 +271,19 @@ void main()
     get_locicfg();
     ijk_detect();
 
+    // Unmount all drives, tape and ROM to ensure a known state
+    drive_unmount_all();
+
     // Testing input
-    //cputsxy(2,4,"012345678901234567890123456789012345");
-    //strcpy(pathbuffer,"0123456789");
-    //textInput(2,5,35,pathbuffer,64,0);
-    //strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
-    //textInput(2,6,35,pathbuffer,64,0);
-    //gotoxy(2,7);
-    //cputs(pathbuffer);
-    //cgetc();
-    //clrscr();
+    // cputsxy(2,4,"012345678901234567890123456789012345");
+    // strcpy(pathbuffer,"0123456789");
+    // textInput(2,5,35,pathbuffer,64,0);
+    // strcpy(pathbuffer,"012345678901234567890123456789012345678901234567890123456789");
+    // textInput(2,6,35,pathbuffer,64,0);
+    // gotoxy(2,7);
+    // cputs(pathbuffer);
+    // cgetc();
+    // clrscr();
 
     // Place header and menubar
     menu_placetop("LOCI File Manager");
@@ -328,9 +334,21 @@ void main()
             else
             {
                 // Perform action on file
-                if (enterchoice == 0)
+                switch (enterchoice)
                 {
+                case 0:
                     dir_select_toggle();
+                    break;
+                
+                case 1:
+                    drive_mount();
+                    break;
+
+                case 2:
+                    break;
+                
+                default:
+                    break;
                 }
             }
             break;
@@ -441,6 +459,11 @@ void main()
         case 'r':
             // r: Rename
             file_rename();
+            break;
+
+        case 'm':
+            // m: mount
+            drive_mount();
             break;
 
         case CH_DEL:
