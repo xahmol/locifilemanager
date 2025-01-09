@@ -19,6 +19,20 @@
 char mount_filename[6][21];
 
 // Functions
+void drive_targetdrive()
+// Select which drive is the target for mount operations
+{
+    unsigned char select;
+
+    select = menu_option_select("Select target drive.", 7);
+
+    if (select)
+    {
+        targetdrive = select - 1;
+        strncpy(pulldown_titles[3][5] + 10, pulldown_titles[7][targetdrive], PULLDOWN_MAXLENGTH - 10);
+    }
+}
+
 void drive_unmount_all()
 // Unmount all images for disk, tape and ROM
 {
@@ -75,7 +89,7 @@ void drive_mount()
             if (!mount(targetdrive, presentdir[activepane].path, presentdirelement.name))
             {
                 sprintf(buffer, "%.20s on %c.", presentdirelement.name, 'A' + targetdrive);
-                strncpy(mount_filename[targetdrive],presentdirelement.name,21);
+                strncpy(mount_filename[targetdrive], presentdirelement.name, 21);
             }
         }
 
@@ -84,8 +98,8 @@ void drive_mount()
         {
             if (!mount(4, presentdir[activepane].path, presentdirelement.name))
             {
-                sprintf(buffer, "%.20s for tape.",presentdirelement.name);
-                strncpy(mount_filename[4],presentdirelement.name,21);
+                sprintf(buffer, "%.20s for tape.", presentdirelement.name);
+                strncpy(mount_filename[4], presentdirelement.name, 21);
             }
         }
 
@@ -94,12 +108,26 @@ void drive_mount()
         {
             if (!mount(5, presentdir[activepane].path, presentdirelement.name))
             {
-                sprintf(buffer, "%.20s for ROM.",presentdirelement.name);
-                strncpy(mount_filename[5],presentdirelement.name,21);
+                sprintf(buffer, "%.20s for ROM.", presentdirelement.name);
+                strncpy(mount_filename[5], presentdirelement.name, 21);
             }
         }
 
         // Show message
         menu_messagepopup(buffer);
+    }
+}
+
+void drive_unmount()
+// Unmount selected drive, tape or ROM
+{
+    unsigned char select;
+
+    select = menu_option_select("Select what to unmount/eject.", 8);
+
+    if (select > 0 && select < 7)
+    {
+        umount(select - 1);
+        mount_filename[select - 1][0] = 0;
     }
 }

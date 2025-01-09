@@ -26,7 +26,7 @@ struct MenuBar menubar = {
     {0, 0, 0, 0, 0},
     0};
 
-char pulldown_options[PULLDOWN_NUMBER] = {5, 7, 7, 7, 2, 3, 5, 4, 2};
+char pulldown_options[PULLDOWN_NUMBER] = {5, 7, 7, 7, 2, 3, 5, 4, 7, 2};
 char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] = {
     {"Confirm:  Once  ",
      "Enter:    Select",
@@ -43,7 +43,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
     {"[/] Go to root",
      "[C LEFT] Back ",
      "Page [D]own   ",
-     "Page [U]p     ",
+     "Page U[P]     ",
      "[T]op         ",
      "[B]ottom      ",
      "[N]ew dir     "},
@@ -68,6 +68,13 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "B    ",
      "C    ",
      "D    "},
+    {"A   ",
+     "B   ",
+     "C   ",
+     "D   ",
+     "Tape",
+     "ROM ",
+     "None"},	
     {"Yes",
      "No "}};
 
@@ -410,4 +417,16 @@ void menu_messagepopup(const char *message)
     getkey(ijk_present);
 
     windowrestore();
+}
+
+unsigned char menu_option_select(const char *message, unsigned char menu)
+// Select option from pulldown
+{
+    unsigned char option;
+    windownew(5, 8, 12);
+    cputsxy(7, 9, message);
+    cputsxy(7,11, "Select option:");
+    option = menu_pulldown(10, 12, menu, 1);
+    windowrestore();
+    return option;
 }

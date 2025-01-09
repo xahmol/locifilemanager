@@ -101,7 +101,7 @@ void file_copy_selected()
                         }
                     }
                     // Delete file if user selects overwrite
-                    if (_sysremove(pathbuffer) != 0)
+                    if (remove(pathbuffer) != 0)
                     {
                         cputsxy(2, 12, "Error deleting file.");
                         break;
@@ -199,7 +199,7 @@ void file_delete()
                 strncat(pathbuffer, presentdirelement.name, sizeof(pathbuffer) - strlen(pathbuffer));
 
                 // Delete file
-                if (_sysremove(pathbuffer) != 0)
+                if (remove(pathbuffer) != 0)
                 {
                     cputsxy(2, 12, "Error deleting file.");
                     break;
@@ -260,7 +260,7 @@ void file_rename()
                 strncat(pathbuffer2, input, sizeof(pathbuffer2) - strlen(pathbuffer2));
 
                 // Rename
-                if (_sysrename(pathbuffer, pathbuffer2))
+                if (rename(pathbuffer, pathbuffer2))
                 {
                     // Print error message
                     cputsxy(2, 14, "Rename failed. Prsss key.");

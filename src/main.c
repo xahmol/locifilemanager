@@ -22,17 +22,6 @@ char version[22];
 unsigned char done;
 
 // Main menu operation
-unsigned char option_select(unsigned char menu)
-// Select option from pulldown
-{
-    unsigned char option;
-    windownew(5, 8, 10);
-    cputsxy(7, 9, "Select option:");
-    option = menu_pulldown(10, 11, menu, 1);
-    windowrestore();
-    return option;
-}
-
 void confirm_toggle()
 // Toggle confirm once or all
 {
@@ -53,7 +42,7 @@ void select_enter_choice()
 {
     unsigned char select;
 
-    select = option_select(5);
+    select = menu_option_select("Action for enter",5);
 
     if (select)
     {
@@ -67,7 +56,7 @@ void select_filter()
 {
     unsigned char select;
 
-    select = option_select(6);
+    select = menu_option_select("Apply filter",6);
 
     if (select)
     {
@@ -75,20 +64,6 @@ void select_filter()
         strncpy(pulldown_titles[0][2] + 10, pulldown_titles[6][filter], PULLDOWN_MAXLENGTH - 10);
         dir_draw(0, 1);
         dir_draw(1, 1);
-    }
-}
-
-void select_targetdrive()
-// Select which drive is the target for mount operations
-{
-    unsigned char select;
-
-    select = option_select(7);
-
-    if (select)
-    {
-        targetdrive = select - 1;
-        strncpy(pulldown_titles[3][5] + 10, pulldown_titles[7][targetdrive], PULLDOWN_MAXLENGTH - 10);
     }
 }
 
@@ -221,10 +196,11 @@ void mainmenuloop()
             break;
 
         case 45:
+            drive_unmount();
             break;
 
         case 46:
-            select_targetdrive();
+            drive_targetdrive();
             break;
 
         case 47:
@@ -401,7 +377,7 @@ void main()
             dir_pagedown();
             break;
 
-        case 'u':
+        case 'p':
             // u: Page up
             dir_pageup();
             break;
@@ -453,7 +429,7 @@ void main()
 
         case 'g':
             // g: select target drive
-            select_targetdrive();
+            drive_targetdrive();
             break;
 
         case 'r':
@@ -464,6 +440,11 @@ void main()
         case 'm':
             // m: mount
             drive_mount();
+            break;
+
+        case 'u':
+            // u: unmount
+            drive_unmount();
             break;
 
         case CH_DEL:

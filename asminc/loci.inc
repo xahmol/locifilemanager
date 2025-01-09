@@ -55,6 +55,7 @@ MIA_OP_RENAME             := $1C
 MIA_OP_OPENDIR            := $80
 MIA_OP_CLOSEDIR           := $81
 MIA_OP_READDIR            := $82
+MIA_OP_MKDIR              := $83
 MIA_OP_GETCWD             := $88
 MIA_OP_MOUNT              := $90
 MIA_OP_UMOUNT             := $91

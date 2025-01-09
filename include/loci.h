@@ -147,6 +147,7 @@ long __fastcall__ mia_call_long_errno(unsigned char op);
 #define MIA_OP_OPENDIR 0x80
 #define MIA_OP_CLOSEDIR 0x81
 #define MIA_OP_READDIR 0x82
+#define MIA_OP_MKDIR 0x83
 
 #define MIA_OP_GETCWD 0x88
 
@@ -314,8 +315,6 @@ int __fastcall__ file_load(const char *file, void *dst, unsigned int count);
 int file_copy(const char *dst, const char *src, unsigned char prog, unsigned char progx, unsigned char progy, unsigned char progl);
 int __fastcall__ file_exists(const char *file);
 
-unsigned char __fastcall__ _sysrename(const char *oldpath, const char *newpath);
-unsigned char __fastcall__ _sysremove(const char *name);
 int __fastcall__ _sysuname(struct utsname *buf);
 
 // XRAM MemCopy
