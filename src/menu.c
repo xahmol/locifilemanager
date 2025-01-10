@@ -7,6 +7,7 @@
 #include <peekpoke.h>
 #include <ctype.h>
 #include <atmos.h>
+#include <errno.h>
 #include "osdklib.h"
 #include "loci.h"
 #include "defines.h"
@@ -75,7 +76,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "D   ",
      "Tape",
      "ROM ",
-     "None"},	
+     "None"},
     {"Yes",
      "No "}};
 
@@ -389,16 +390,18 @@ unsigned char menu_areyousure(const char *message)
     return choice;
 }
 
-void menu_fileerrormessage(int error)
+void menu_fileerrormessage()
 // Show message for file error encountered
 // Input: error = error number
 {
-    windownew(5, 8, 6);
+    windownew(5, 8, 8);
 
     cputsxy(7, 9, "File error!");
 
-    cputsxy(7, 11, "Error nr.: ");
-    cprintf("%4X", error);
+    gotoxy(7, 11);
+    cprintf("Error# : %d", errno);
+    gotoxy(7,12);
+    cprintf("Message: %.30s", strerror(errno));
 
     cputsxy(7, 13, "Press key.");
     getkey(ijk_present);
@@ -426,7 +429,7 @@ unsigned char menu_option_select(const char *message, unsigned char menu)
     unsigned char option;
     windownew(5, 8, 12);
     cputsxy(7, 9, message);
-    cputsxy(7,11, "Select option:");
+    cputsxy(7, 11, "Select option:");
     option = menu_pulldown(10, 12, menu, 1);
     windowrestore();
     return option;

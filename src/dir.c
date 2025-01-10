@@ -1003,7 +1003,7 @@ void dir_deletedir()
         if (!dir)
         {
             // Exit if dir can not be opened
-            menu_messagepopup("Error opening directory.");
+            menu_fileerrormessage();
             return;
         }
 
@@ -1029,7 +1029,7 @@ void dir_deletedir()
         if (remove(pathbuffer) != 0)
         {
             // Error message
-            menu_messagepopup("Error deleting dir.");
+            menu_fileerrormessage();
         }
         else
         {
