@@ -42,7 +42,7 @@ void select_enter_choice()
 {
     unsigned char select;
 
-    select = menu_option_select("Action for enter",5);
+    select = menu_option_select("Action for enter", 5);
 
     if (select)
     {
@@ -56,7 +56,7 @@ void select_filter()
 {
     unsigned char select;
 
-    select = menu_option_select("Apply filter",6);
+    select = menu_option_select("Apply filter", 6);
 
     if (select)
     {
@@ -68,6 +68,7 @@ void select_filter()
 }
 
 void versioninfo()
+// Show version information
 {
     windownew(2, 5, 15);
     cputsxy(4, 6, "Version information and credits");
@@ -82,6 +83,14 @@ void versioninfo()
     getkey(ijk_present);
     windowrestore();
 }
+
+void help()
+// Show help information
+{
+    menu_messagepopup("Help not implemented yet.");
+}
+
+// Main application loops
 
 void mainmenuloop()
 // Go to main menu and act on selection made
@@ -141,7 +150,16 @@ void mainmenuloop()
             break;
 
         case 25:
-            file_delete();
+            // If no selection made and cursor is on a dir: delete dir
+            if (!selection && presentdirelement.meta.type == 1)
+            {
+                dir_deletedir();
+            }
+            else
+            // Else: Delete files
+            {
+                file_delete();
+            }
             break;
 
         case 26:
@@ -150,6 +168,10 @@ void mainmenuloop()
 
         case 27:
             file_copy_selected();
+            break;
+
+        case 28:
+            file_browse_tape();
             break;
 
         case 31:
@@ -177,6 +199,7 @@ void mainmenuloop()
             break;
 
         case 37:
+            dir_newdir();
             break;
 
         case 41:
@@ -212,6 +235,7 @@ void mainmenuloop()
             break;
 
         case 52:
+            help();
             break;
 
         default:
@@ -220,8 +244,8 @@ void mainmenuloop()
     } while (choice < 99);
 }
 
-// Main loop
 void main()
+//  Main program start, loop and end
 {
     unsigned char key;
     unsigned char len;
@@ -232,6 +256,7 @@ void main()
     confirm = 0;
     sort = 0;
     targetdrive = 0;
+    selection = 0;
 
     // Set version number in string variable
     sprintf(version,
@@ -315,14 +340,14 @@ void main()
                 case 0:
                     dir_select_toggle();
                     break;
-                
+
                 case 1:
                     drive_mount();
                     break;
 
                 case 2:
                     break;
-                
+
                 default:
                     break;
                 }
@@ -447,9 +472,28 @@ void main()
             drive_unmount();
             break;
 
+        case 'w':
+            // b: browse tape
+            file_browse_tape();
+            break;
+
+        case 'e':
+            // n: new dir
+            dir_newdir();
+            break;
+
         case CH_DEL:
-            // Del: Delete files
-            file_delete();
+            // Del: Delete files or dir
+            // If no selection made and cursor is on a dir: delete dir
+            if (!selection && presentdirelement.meta.type == 1)
+            {
+                dir_deletedir();
+            }
+            else
+            // Else: Delete files
+            {
+                file_delete();
+            }
             break;
 
         default:

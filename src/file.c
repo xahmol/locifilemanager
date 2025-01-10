@@ -26,7 +26,7 @@ unsigned char file_confirm_message(const char *message, const char *file)
 
     windownew(0, 14, 9);
     cputsxy(2, 16, message);
-    cputsxy(2, 18, "File:");
+    cputsxy(2, 18, "Name:");
     gotoxy(2, 19);
     cprintf("%.30s", file);
     choice = menu_pulldown(10, 20, MENU_YESNO, 0);
@@ -53,7 +53,17 @@ void file_copy_selected()
     {
         windownew(0, 8, 15);
 
-        cputsxy(2, 9, "Copy files to:");
+        // If nothing is selected and cursor pos is not a dir: select single file on cursor pos
+        if (!selection && presentdirelement.meta.type > 1)
+        {
+            presentdirelement.meta.select = 1;
+            dir_save_element(present);
+            selection++;
+        }
+
+        // Print user info
+        gotoxy(2, 9);
+        cprintf("Copy %u files to:", selection);
         gotoxy(2, 10);
         cprintf("%.35s", presentdir[target].path);
 
@@ -62,6 +72,7 @@ void file_copy_selected()
         cputsxy(2, 12, "Copying file:");
         cputsxy(2, 15, "Press ESC to cancel after next file.");
 
+        // Loop through all elements to copy all selected files
         do
         {
             dir_get_element(element);
@@ -134,7 +145,7 @@ void file_copy_selected()
         // Show message if no files selected
         if (!count)
         {
-            cputsxy(2, 13, "No files selected.");
+            cputsxy(2, 13, "Nothing to copy.");
         }
 
         gotoxy(2, 15);
@@ -146,9 +157,12 @@ void file_copy_selected()
 
         // Draw new dirs
         dir_draw(target, 1);
-        if (count)
+
+        // Reset selection to 0
+        if (count || selection)
         {
             dir_select_all(0);
+            selection = 0;
         }
     }
 }
@@ -164,10 +178,20 @@ void file_delete()
     {
         windownew(0, 8, 15);
 
-        cputsxy(2, 9, "Delete files:");
+        // If nothing is selected and cursor pos is not a dir: select single file on cursor pos
+        if (!selection && presentdirelement.meta.type > 1)
+        {
+            presentdirelement.meta.select = 1;
+            dir_save_element(present);
+            selection++;
+        }
+
+        gotoxy(2, 9);
+        cprintf("Delete %u files:", selection);
 
         element = presentdir[activepane].firstelement;
 
+        // Loop through all elements to delete all selected files
         do
         {
             dir_get_element(element);
@@ -211,7 +235,7 @@ void file_delete()
         // Show message if no files selected
         if (!count)
         {
-            cputsxy(2, 11, "No files selected.");
+            cputsxy(2, 11, "No files to delete.");
         }
 
         cputsxy(2, 15, "Press key.");
@@ -221,6 +245,13 @@ void file_delete()
 
         // Draw new dirs
         dir_draw(activepane, 1);
+
+        // Reset selection to 0
+        if (count || selection)
+        {
+            dir_select_all(0);
+            selection = 0;
+        }
     }
 }
 
@@ -280,4 +311,10 @@ void file_rename()
         }
         windowrestore();
     }
+}
+
+void file_browse_tape()
+// Function to browse a .TAP tape archive
+{
+    menu_messagepopup("Not implemented yet.");
 }

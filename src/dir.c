@@ -13,6 +13,7 @@
 #include "generic.h"
 #include "menu.h"
 #include "dir.h"
+#include "file.h"
 
 // Variables
 struct DirElement presentdirelement;
@@ -28,6 +29,7 @@ unsigned char enterchoice;
 unsigned char confirm;
 unsigned char sort;
 unsigned char targetdrive;
+int selection;
 char *diraddress[2] = {(char *)DIR1BASE, (char *)DIR2BASE};
 
 char dir_entry_types[6][4] =
@@ -858,6 +860,14 @@ void dir_select_toggle()
         presentdirelement.meta.select = !presentdirelement.meta.select;
         dir_save_element(present);
         dir_print_entry(activepane, presentdir[activepane].position);
+        if (presentdirelement.meta.select)
+        {
+            selection++;
+        }
+        else
+        {
+            selection--;
+        }
     }
 }
 
@@ -870,12 +880,14 @@ void dir_select_all(unsigned char select)
     if (presentdir[activepane].firstelement)
     {
         element = presentdir[activepane].firstelement;
+        selection = 0;
         do
         {
             dir_get_element(element);
             if (presentdirelement.meta.type > 1)
             {
                 presentdirelement.meta.select = select;
+                selection++;
                 dir_save_element(element);
             }
             element = presentdirelement.meta.next;
@@ -892,12 +904,21 @@ void dir_select_inverse()
     if (presentdir[activepane].firstelement)
     {
         element = presentdir[activepane].firstelement;
+        selection = 0;
         do
         {
             dir_get_element(element);
             if (presentdirelement.meta.type > 1)
             {
                 presentdirelement.meta.select = !presentdirelement.meta.select;
+                if (presentdirelement.meta.select)
+                {
+                    selection++;
+                }
+                else
+                {
+                    selection--;
+                }
                 dir_save_element(element);
             }
             element = presentdirelement.meta.next;
@@ -959,4 +980,61 @@ void dir_togglesort()
         strcpy(buffer, "Off    ");
     }
     strncpy(pulldown_titles[0][3] + 10, buffer, PULLDOWN_MAXLENGTH - 10);
+}
+
+void dir_newdir()
+// Create new directory in active pane
+{
+    menu_messagepopup("Not implemented yet.");
+}
+
+void dir_deletedir()
+// Delete directory in active pane
+{
+    if (presentdir[activepane].firstelement && presentdirelement.meta.type == 1)
+    {
+        // Derive full target path
+        strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));
+        strncat(pathbuffer, presentdirelement.name, sizeof(pathbuffer) - strlen(pathbuffer));
+
+        // Check if dir is empty
+        // First: open dir
+        dir = opendir(pathbuffer);
+        if (!dir)
+        {
+            // Exit if dir can not be opened
+            menu_messagepopup("Error opening directory.");
+            return;
+        }
+
+        // Then: try to read first entry
+        file = readdir(dir);
+        if (file->d_name[0] != 0)
+        {
+            // Exit if dir is not empty
+            menu_messagepopup("Directory is not empty.");
+            closedir(dir);
+            return;
+        }
+        // Close dir
+        closedir(dir);
+
+        // Confirm delete
+        if (!file_confirm_message("Delete dir?", presentdirelement.name))
+        {
+            return;
+        }
+
+        // Delete file
+        if (remove(pathbuffer) != 0)
+        {
+            // Error message
+            menu_messagepopup("Error deleting dir.");
+        }
+        else
+        {
+            // Redraw dir
+            dir_draw(activepane, 1);
+        }
+    }
 }

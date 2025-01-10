@@ -13,6 +13,8 @@
 #define PANE_HEIGHT 10
 
 // Structs and variables
+
+// Structure for directory meta data
 struct DirMeta
 {
     unsigned next;        // Pointer to next element
@@ -22,6 +24,7 @@ struct DirMeta
     unsigned char length; // Length of name
 };
 
+// Structure for directory element
 struct DirElement
 {
     char name[64];       // Entry name
@@ -29,6 +32,7 @@ struct DirElement
 };
 extern struct DirElement presentdirelement;
 
+// Structure for active directory for both panes
 struct Directory
 {
     unsigned firstelement;  // Pointer to first element
@@ -42,19 +46,24 @@ struct Directory
 };
 extern struct Directory presentdir[2];
 
+// Directory reading variables
 extern DIR *dir;
 extern struct dirent *file;
+extern char dir_entry_types[6][4]; // Directory entry type name text strings
 
-extern char dir_entry_types[6][4];
-extern unsigned char activepane;
-extern unsigned present;
-extern unsigned previous;
-extern unsigned next;
-extern unsigned char filter;
-extern unsigned char enterchoice;
-extern unsigned char confirm;
-extern unsigned char sort;
-extern unsigned char targetdrive;
+// Application variables
+extern unsigned char activepane;  // Number of active pane: 0 is upper, 1 is lower
+extern unsigned present;          // Present element
+extern unsigned previous;         // Previous element
+extern unsigned next;             // Next element
+extern unsigned char filter;      // Filter for file type, 0: None, 1: DSK, 2: TAP, 3: ROM, 4: LCE
+extern unsigned char enterchoice; // Choice for enter action: 0: Select, 1: Mount or 2: Launch
+extern unsigned char confirm;     // Confirm once (01) or all (1)
+extern unsigned char sort;        // Sort on (1) or off (0)
+extern unsigned char targetdrive; // Target drive for mount: 0: A, 1: B, 2: C, 3: D
+extern int selection;             // Selection present for file operation: 0: not present, 1: present
+
+// Buffers for full paths
 extern char pathbuffer[256];
 extern char pathbuffer2[256];
 
@@ -81,5 +90,7 @@ void dir_select_inverse();
 void dir_gotoroot();
 void dir_parentdir();
 void dir_togglesort();
+void dir_newdir();
+void dir_deletedir();
 
 #endif // __DIR_H_
