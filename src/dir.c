@@ -985,7 +985,44 @@ void dir_togglesort()
 void dir_newdir()
 // Create new directory in active pane
 {
-    menu_messagepopup("Not implemented yet.");
+    char input[64] = "";
+
+    if (presentdir[activepane].firstelement)
+    {
+        windownew(0, 8, 15);
+
+        cputsxy(2, 9, "Create directory.");
+
+        cputsxy(2, 11, "Enter dir name:");
+
+        // Input new name and check if not cancelled or empty string
+        if (textInput(2, 12, 35, input, 64, 0) > 0)
+        {
+            // Set target full path
+            strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));
+            strncat(pathbuffer, input, sizeof(pathbuffer) - strlen(pathbuffer));
+
+            // Create directory
+            if (mkdir(pathbuffer) != 0)
+            {
+                menu_fileerrormessage();
+            }
+            else
+            {
+                // Wait for dir create to finish
+                while (dir = opendir(pathbuffer), !dir)
+                {
+                    // Wait
+                    ;
+                }
+                closedir(dir);
+
+                // Redraw dir
+                dir_draw(activepane, 1);
+            }
+        }
+        windowrestore();
+    }
 }
 
 void dir_deletedir()
@@ -997,27 +1034,34 @@ void dir_deletedir()
         strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));
         strncat(pathbuffer, presentdirelement.name, sizeof(pathbuffer) - strlen(pathbuffer));
 
-        // Check if dir is empty
-        // First: open dir
-        dir = opendir(pathbuffer);
-        if (!dir)
-        {
-            // Exit if dir can not be opened
-            menu_fileerrormessage();
-            return;
-        }
+        // Check if dir is empty if USB storage
+        // This fails on internal storage as that returns . and .. subdirs
+        // So for internal storage rely on OS error handling instead
 
-        // Then: try to read first entry
-        file = readdir(dir);
-        if (file->d_name[0] != 0)
+        // Check if drive number is mot zero
+        if (presentdir[activepane].drive)
         {
-            // Exit if dir is not empty
-            menu_messagepopup("Directory is not empty.");
+            // First: open dir
+            dir = opendir(pathbuffer);
+            if (!dir)
+            {
+                // Exit if dir can not be opened
+                menu_fileerrormessage();
+                return;
+            }
+
+            // Then: try to read first entry
+            file = readdir(dir);
+            if (file->d_name[0] != 0)
+            {
+                // Exit if dir is not empty
+                menu_messagepopup("Directory is not empty.");
+                closedir(dir);
+                return;
+            }
+            // Close dir
             closedir(dir);
-            return;
         }
-        // Close dir
-        closedir(dir);
 
         // Confirm delete
         if (!file_confirm_message("Delete dir?", presentdirelement.name))

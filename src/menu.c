@@ -48,7 +48,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "Page U[P]     ",
      "[T]op         ",
      "[B]ottom      ",
-     "N[e}w dir     "},
+     "N[e]w dir     "},
     {"[/] Switch pane",
      "[.] Next drive ",
      "[,] Prev drive ",
