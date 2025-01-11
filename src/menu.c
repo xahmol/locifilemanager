@@ -30,7 +30,7 @@ struct MenuBar menubar = {
 char pulldown_options[PULLDOWN_NUMBER] = {5, 8, 7, 7, 2, 3, 5, 4, 7, 2};
 char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] = {
     {"Confirm:  Once  ",
-     "Enter:    Select",
+     "Return:   Select",
      "[F]ilter: None  ",
      "S[O]rt:   Off   ",
      "[ESC] Exit      "},
@@ -48,7 +48,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "Page U[P]     ",
      "[T]op         ",
      "[B]ottom      ",
-     "N[e]w dir     "},
+     "N[ew dir     "},
     {"[/] Switch pane",
      "[.] Next drive ",
      "[,] Prev drive ",

@@ -21,6 +21,31 @@ char buffer[41];
 char version[22];
 unsigned char done;
 
+// Help text
+char helpinfo[22][2][28] = {
+    {"Curs Up/Do", "Move up and down"},
+    {"Curs Left", "Go to parent dir"},
+    {"Curs Right", "Go to menu"},
+    {"RETURN", "Select/mount/launch"},
+    {"ESC", "Exit application"},
+    {". / ,", "Next/prev drive for pane"},
+    {"/", "Switch pane"},
+    {"\\", "Go to root"},
+    {"D/P/T/B", "Page down,up, top/bottom"},
+    {"S/A/N/I", "Select toggle/all/none/inv"},
+    {"O", "Sort toggle"},
+    {"F", "Select filter to apply"},
+    {"C", "Copy file/selected files"},
+    {"DEL", "Delete file(s)/dir"},
+    {"G", "Select target drive mount"},
+    {"R", "Rename file/dir"},
+    {"M / U", "Mount/unmount"},
+    {"W", "Browse tape"},
+    {"E", "Create new directory"},
+    {"H", "Show this help screen"},
+    {"Curs keys", "Menu navigation"},
+    {"ESC/RETURN", "Cancel / Confirm"}};
+
 // Main menu operation
 void confirm_toggle()
 // Toggle confirm once or all
@@ -87,7 +112,34 @@ void versioninfo()
 void help()
 // Show help information
 {
-    menu_messagepopup("Help not implemented yet.");
+    unsigned char item;
+    unsigned char y = 2;
+
+    windowsave(1, 27);
+    cleararea(1, 27);
+
+    gotoxy(0, y++);
+    cprintf("%c%cKeyboard shortcuts help information", A_FWGREEN, A_BGBLACK);
+    for (item = 0; item < 20; item++)
+    {
+        gotoxy(0, y++);
+        cprintf("%c%c%-10s:%c%s", A_FWCYAN, A_BGBLACK, helpinfo[item][0], A_FWYELLOW, helpinfo[item][1]);
+    }
+    gotoxy(0, y++);
+    cprintf("%c%cIn main meny and pulldown menus", A_FWGREEN, A_BGBLACK);
+    for (item = 0; item < 2; item++)
+    {
+        gotoxy(0, y++);
+        cprintf("%c%c%-10s:%c%s", A_FWCYAN, A_BGBLACK, helpinfo[item + 20][0], A_FWYELLOW, helpinfo[item + 20][1]);
+    }
+
+    y++;
+    gotoxy(0, y++);
+    cprintf("%c%cPress a key to continue", A_FWGREEN, A_BGBLACK);
+
+    getkey(ijk_present);
+
+    windowrestore();
 }
 
 // Main application loops
@@ -403,7 +455,7 @@ void main()
             break;
 
         case 'p':
-            // u: Page up
+            // p: Page up
             dir_pageup();
             break;
 
@@ -480,6 +532,11 @@ void main()
         case 'e':
             // n: new dir
             dir_newdir();
+            break;
+
+        case 'h':
+            // h: help
+            help();
             break;
 
         case CH_DEL:
