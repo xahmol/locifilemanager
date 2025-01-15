@@ -92,7 +92,7 @@ $(LIBRARY): $(LSOURCES:.c=.o) $(LASOURCES:.s=.o)
 
 # Link compiled objects 
 $(PROGRAM): $(SOURCES:.c=.o) $(LIBRARY)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o  $@ $^ src/tapehdr.s 
 
 # Build disk
 #$(DISK_DSK): $(PROGRAM) $(TESTPROG_BIN)

@@ -467,8 +467,7 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
     }
 
     // Print entry data
-    sprintf(buffer, "%.32s", presentdirelement.name, 32);
-    cprintf("%-32s %.3s", buffer, dir_entry_types[presentdirelement.meta.type - 1]);
+    cprintf("%-32.32s %.3s", presentdirelement.name, dir_entry_types[presentdirelement.meta.type - 1]);
 }
 
 void dir_draw(unsigned char dirnr, unsigned char readdir)
