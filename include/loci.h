@@ -294,16 +294,25 @@ void __fastcall__ rewinddir(DIR *dir);
 // Storage config
 #define MAXDEV 9 // Maxium of devices
 
+struct LOCIVERSION
+{
+    unsigned char major;
+    unsigned char minor;
+    unsigned char patch;
+};
+
 struct LOCICFGSTRUCT
 {
     unsigned char devnr;
     unsigned char validdev[MAXDEV+1];
     struct utsname uname;
+    struct LOCIVERSION version;
 };
 extern struct LOCICFGSTRUCT locicfg;
 
 void get_locicfg();
 const char *get_loci_devname(unsigned char devid, unsigned char maxlength);
+unsigned char loci_check_fw(unsigned char major, unsigned char minor, unsigned char patch);
 
 // File operations
 #define COPYBUF_XRAM_ADDR 0x8000

@@ -4,6 +4,12 @@
 // Global variables
 extern char buffer[41];
 extern char version[22];
+extern unsigned char fdc_on;
+extern unsigned char tap_on;
+extern unsigned char b11_on;
+extern unsigned char bit_on;
+extern unsigned char ald_on;
+
 
 /* Char defines */
 #define CH_SPACE            0x20        // Screencode for space

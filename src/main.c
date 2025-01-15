@@ -20,6 +20,11 @@
 char buffer[41];
 char version[22];
 unsigned char done;
+unsigned char fdc_on;
+unsigned char tap_on;
+unsigned char b11_on;
+unsigned char bit_on;
+unsigned char ald_on;
 
 // Help text
 char helpinfo[22][2][28] = {
@@ -142,6 +147,15 @@ void help()
     windowrestore();
 }
 
+void boot()
+{
+    mia_set_ax(0x80 | (ald_on << 4) | (bit_on << 3) | (b11_on << 2) | (tap_on << 1) | fdc_on);
+    VIA.ier = 0x7F; // Disable VIA interrupts
+    mia_call_int_errno(MIA_OP_BOOT);
+    VIA.ier = 0xC0;
+    done = 1;
+}
+
 // Main application loops
 
 void mainmenuloop()
@@ -180,7 +194,7 @@ void mainmenuloop()
         case 15:
             if (menu_areyousure("Exit application.") == 1)
             {
-                done = 1;
+                boot();
                 choice = 99;
             }
             break;
@@ -309,6 +323,11 @@ void main()
     sort = 0;
     targetdrive = 0;
     selection = 0;
+    fdc_on = 0;
+    tap_on = 0;
+    b11_on = 0;
+    bit_on = 0;
+    ald_on = 0;
 
     // Set version number in string variable
     sprintf(version,
@@ -398,6 +417,9 @@ void main()
                     break;
 
                 case 2:
+                    drive_unmount_all();
+                    drive_mount();
+                    boot();
                     break;
 
                 default:
@@ -410,7 +432,7 @@ void main()
             // ESC: Application exit
             if (menu_areyousure("Exit application.") == 1)
             {
-                done = 1;
+                boot();
             }
             break;
 
@@ -561,4 +583,5 @@ void main()
     // Clear screen on exit
     setflags(SCREEN);
     clrscr();
+    cprintf("Nothing to boot or boot failed.\n\r");
 }

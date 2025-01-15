@@ -286,7 +286,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                         //       "\n\r%s\n\r",
                         //       bufferdir.name);
 
-                        if (strncmp(bufferdir.name, file->d_name, 32) > 0)
+                        if (stricmp(bufferdir.name, file->d_name) > 0)
                         {
                             // Insert before the first one?
                             if (!bufferdir.meta.prev)

@@ -42,6 +42,11 @@ void drive_unmount_all()
     {
         umount(drive);
         mount_filename[drive][0] = 0;
+        fdc_on = 0;
+        tap_on = 0;
+        b11_on = 0;
+        bit_on = 0;
+        ald_on = 0;
     }
 }
 
@@ -90,6 +95,7 @@ void drive_mount()
             {
                 sprintf(buffer, "%.20s on %c.", presentdirelement.name, 'A' + targetdrive);
                 strncpy(mount_filename[targetdrive], presentdirelement.name, 21);
+                fdc_on = 1;
             }
         }
 
@@ -100,6 +106,8 @@ void drive_mount()
             {
                 sprintf(buffer, "%.20s for tape.", presentdirelement.name);
                 strncpy(mount_filename[4], presentdirelement.name, 21);
+                tap_on = 1;
+                ald_on = 1;
             }
         }
 
@@ -110,6 +118,7 @@ void drive_mount()
             {
                 sprintf(buffer, "%.20s for ROM.", presentdirelement.name);
                 strncpy(mount_filename[5], presentdirelement.name, 21);
+                b11_on = 1;
             }
         }
 
@@ -122,6 +131,8 @@ void drive_unmount()
 // Unmount selected drive, tape or ROM
 {
     unsigned char select;
+    unsigned char drive;
+    unsigned char mountcount;
 
     select = menu_option_select("Select what to unmount/eject.", 8);
 
@@ -129,5 +140,30 @@ void drive_unmount()
     {
         umount(select - 1);
         mount_filename[select - 1][0] = 0;
+
+        if (select < 5)
+        {
+            mountcount = 0;
+            for (drive = 0; drive < 4; drive++)
+            {
+                if (mount_filename[drive][0])
+                {
+                    mountcount++;
+                }
+            }
+            if (!mountcount)
+            {
+                fdc_on = 0;
+            }
+        }
+        if (select == 4)
+        {
+            tap_on = 0;
+            ald_on = 0;
+        }
+        if (select == 5)
+        {
+            b11_on = 0;
+        }
     }
 }
