@@ -11,6 +11,7 @@ File manager for the LOCI mass storage device for Oric Atmos
 
 [Credits](#credits)
 
+![LOCI FM Main Interface](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20main%20interface.png?raw=true)
 
 ## Version history and download
 ([Back to contents](#contents))
