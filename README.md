@@ -55,9 +55,19 @@ Minimum requirements:
 
 ## Start program
 ([Back to contents](#contents))
+- Download the latest build of the 'locifm.tap' file from [here](https://github.com/xahmol/locifilemanager/raw/refs/heads/main/BUILD/locifm.tap).
+- Save image on the desired location on the USB stick you want to use for your LOCI device and connect that USB (back) into the LOCI device
+- Go to the LOCI user interface by pressing the red button on the LOCI. You shluld get the LOCI interface like this:
+![LOCI UI Start program](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20start%20program.png?raw=true)
+- Go to the field to select tape images by pressing T (or go there via cursor keys)
+- Press SPACE to go to the file browser
+- Navigate to the location on your USB stick where you have stored the 'locifm.tap' file.
+- Select by SPACE
+- Boot into application by pressing ESC.
+- If the Auto load option of the LOCI is enabled, loading from tape will start automatically. If not, press CLOAD" and RETURN.
+- The program should now load and start.
 
-- Go to the LOCI user interface by pressing the red button on the LOCI
-- 
+For details on how to operate your LOCI device, see the [LOCI manual](https://github.com/sodiumlb/loci-hardware/wiki/LOCI-User-Manual).
 
 ## Credits
 ([Back to contents](#contents))
