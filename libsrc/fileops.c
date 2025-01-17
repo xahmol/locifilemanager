@@ -7,7 +7,7 @@
 // - Picocomputer 6502 by Rumbledethumps, 2023, https://github.com/picocomputer/rp6502
 // - cc65 by Ullrich von Bassewitz,  Based on code by Groepaz. https://github.com/cc65/cc65
 //
-// Apapted and extended by Xander Mol, 2024
+// Apapted and extended by Xander Mol, 2025
 
 #include "loci.h"
 #include "osdklib.h"

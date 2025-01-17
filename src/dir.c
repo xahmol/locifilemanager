@@ -1,3 +1,47 @@
+/*
+LOCI File Manager
+File manager for the LOCI mass storage device for Oric Atmos
+Written in 2025 by Xander Mol
+
+https://github.com/xahmol/locifilemanager
+https://www.idreamtin8bits.com/
+
+For information and documentation on the LOCI mass storage device:
+-   LOCI User Manual
+    https://github.com/sodiumlb/loci-hardware/wiki/LOCI-User-Manual
+-   Sellers of my assembled LOCI device:
+    - Raxiss: https://www.raxiss.com/article/id/38-LOCI
+
+Code and resources from others used:
+-   LOCI ROM by Sodiumlightbaby, 2024
+    https://github.com/sodiumlb/loci-rom
+
+-   CC65 cross compiler:
+    https://cc65.github.io/
+
+-   DraBrowse source code for inspiration and text input routine
+    DraBrowse (db*) is a simple file browser.
+    Originally created 2009 by Sascha Bader.
+    Used version adapted by Dirk Jagdmann (doj)
+    https://github.com/doj/dracopy
+
+-   lib-ijk-egoist from oricOpenLibrary (for joystick support via Raxiss IJK interface)
+    By Raxiss, (c) 2021
+    https://github.com/iss000/oricOpenLibrary/tree/main/lib-ijk-egoist
+
+-   forum.defence-force.org: For inspiration and advice while coding.
+
+-   Original windowing system code on Commodore 128 by unknown author.
+   
+-   Tested using real hardware Oric Atmos plus LOCI
+
+The code can be used freely as long as you retain
+a notice describing original source and author.
+
+THE PROGRAMS ARE DISTRIBUTED IN THE HOPE THAT THEY WILL BE USEFUL,
+BUT WITHOUT ANY WARRANTY. USE THEM AT YOUR OWN RISK!
+*/
+
 // Includes
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,6 +58,7 @@
 #include "menu.h"
 #include "dir.h"
 #include "file.h"
+#include "drive.h"
 
 // Variables
 struct DirElement presentdirelement;
@@ -32,17 +77,20 @@ unsigned char targetdrive;
 int selection;
 char *diraddress[2] = {(char *)DIR1BASE, (char *)DIR2BASE};
 
-char dir_entry_types[6][4] =
+char dir_entry_types[8][4] =
     {
         "DIR",
         "DSK",
         "TAP",
         "ROM",
         "LCE",
-        "   "};
+        "   ",
+        "BAS",
+        "BIN"};
 
 char pathbuffer[256];
 char pathbuffer2[256];
+unsigned char insidetape[2];
 
 // Functions
 void dir_get_element(unsigned address)
@@ -395,6 +443,223 @@ void dir_read(unsigned char dirnr, unsigned char filter)
     dir_print_id_and_path(dirnr);
 }
 
+void dir_tape_parse(unsigned char dirnr)
+// Parse .TAP file content to directory entries
+// Input: dirnr - active directory pane
+{
+    unsigned char presenttype;
+    unsigned char datalength;
+    unsigned char count = 0;
+    unsigned char xpos = 3;
+    unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
+    unsigned char bg_color;
+    unsigned element;
+    struct DirElement bufferdir;
+    unsigned workaddress;
+    unsigned char inserted;
+    tap_header_t hdr;
+    long counter;
+    unsigned int start_addr, end_addr, size;
+
+    // Set colors based on whether pane is active or not
+    bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
+    ypos++;
+
+    // Prepare progress bar
+    gotoxy(0, ypos);
+    cputc(A_FWBLACK);
+    cputc(bg_color);
+    cputc(A_ALT);
+    cclear(37);
+
+    previous = 0;
+
+    // Debug
+    // unsigned char i;
+
+    // Reset dirdata
+    presentdir[dirnr].address = (dirnr) ? DIR2BASE : DIR1BASE;
+    present = presentdir[dirnr].address;
+
+    // Clear directory values
+    presentdir[dirnr].firstelement = 0;
+    presentdir[dirnr].firstprint = 0;
+    presentdir[dirnr].lastprint = 0;
+    presentdir[dirnr].position = 0;
+    presentdir[dirnr].present = 0;
+
+    // Rewind tape
+    TAP.cmd = TAP_CMD_REW;
+
+    // Loop while new entries are found or memory is full
+    while (counter = tap_read_header(&hdr), counter != -1)
+    {
+        // Get addresses and size
+        start_addr = (unsigned int)((hdr.start_addr_hi << 8) | hdr.start_addr_lo);
+        end_addr = (unsigned int)((hdr.end_addr_hi << 8) | hdr.end_addr_lo);
+        if (start_addr > end_addr)
+        {
+            // Bad/unsupported header
+            size = 0;
+        }
+        else
+        {
+            size = end_addr - start_addr;
+        }
+
+        // Debug
+        //cleararea(16, 12);
+        //gotoxy(0, 16);
+        //cprintf("CNT: %lu FN: %s ST: %4X SZ: %5d", counter, (char *)hdr.filename, start_addr, size);
+        //cgetc();
+
+        // Misuse first four bytes of name for tape counter
+        *((long *)(&buffer)) = counter;
+
+        // Set as name filename, type, start, size
+        sprintf(buffer + 4, "%-12.12s       $%04X %6db",
+                hdr.filename[0] ? (char *)hdr.filename : "<no name>",
+                start_addr,
+                size);
+
+        // Set name length, which is filename plus 4 for counter, plus 1 trailing zero
+        datalength = strlen(buffer + 4) + 5;
+
+        // print progress counter
+        if ((count >> 2) > 36)
+        {
+            xpos = 3;
+            count = 0;
+            gotoxy(xpos, ypos);
+            cclear(37);
+        }
+        else
+        {
+            gotoxy(xpos + (count >> 2), ypos);
+            cputc(progressBar[count & 3]);
+            ++count;
+        }
+
+        // Set data type
+        presenttype = (hdr.type == 0x80) ? 8 : 7;
+
+        // Seek over file on tape
+        counter += sizeof(tap_header_t) + 4 + size;
+        tap_seek(counter);
+
+        // Check if sufficent memory is left
+        if (presentdir[dirnr].address + datalength + sizeof(presentdirelement.meta) > presentdir[dirnr].address + DIRSIZE - 1)
+        {
+            TAP.cmd = TAP_CMD_REW;
+            return;
+        }
+
+        // Set direntry pointers
+        // Is this the first entry?
+        if (!previous)
+        {
+            presentdir[dirnr].firstelement = present;
+            presentdir[dirnr].firstprint = present;
+            presentdirelement.meta.prev = 0;
+            previous = present;
+            presentdirelement.meta.next = 0;
+        }
+        // All next entries
+        else
+        {
+            // Does the list need to be sorted?
+            if (sort)
+            {
+                inserted = 0;
+                // Find element to insert after
+                element = presentdir[dirnr].firstelement;
+                do
+                {
+                    workaddress = element;
+                    xram_memcpy_from(&bufferdir.meta, workaddress, sizeof(bufferdir.meta));
+                    workaddress += sizeof(bufferdir.meta);
+                    xram_memcpy_from(bufferdir.name, workaddress, bufferdir.meta.length);
+
+                    if (stricmp(bufferdir.name + 4, buffer + 4) > 0)
+                    {
+                        // Insert before the first one?
+                        if (!bufferdir.meta.prev)
+                        {
+                            presentdirelement.meta.prev = 0;
+                            presentdirelement.meta.next = element;
+                            bufferdir.meta.prev = present;
+                            presentdir[dirnr].firstelement = present;
+                            presentdir[dirnr].firstprint = present;
+                            xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
+                        }
+                        else
+                        // Insert in between
+                        {
+                            presentdirelement.meta.prev = bufferdir.meta.prev;
+                            presentdirelement.meta.next = element;
+                            bufferdir.meta.prev = present;
+                            xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
+                            xram_memcpy_from(&bufferdir.meta, presentdirelement.meta.prev, sizeof(bufferdir.meta));
+                            bufferdir.meta.next = present;
+                            xram_memcpy_to(presentdirelement.meta.prev, &bufferdir.meta, sizeof(bufferdir.meta));
+                        }
+                        inserted = 1;
+                        break;
+                    }
+                    element = bufferdir.meta.next;
+                } while (element);
+
+                // Insert at the ned
+                if (!inserted)
+                {
+                    // cprintf("Insert at the end.\n\r");
+
+                    presentdirelement.meta.prev = previous;              // Set prev in new entry
+                    xram_memcpy_to(previous, &present, sizeof(present)); // Set next in previous entry
+                    previous = present;
+                    presentdirelement.meta.next = 0;
+                }
+                // cgetc();
+            }
+            else
+            {
+                presentdirelement.meta.prev = previous;              // Set prev in new entry
+                xram_memcpy_to(previous, &present, sizeof(present)); // Set next in previous entry
+                previous = present;
+                presentdirelement.meta.next = 0;
+            }
+        }
+
+        presentdirelement.meta.select = 0;
+        presentdirelement.meta.type = presenttype;
+        datalength++;
+        presentdirelement.meta.length = datalength;
+
+        // Set meta data
+        xram_memcpy_to(presentdir[dirnr].address, &presentdirelement.meta, sizeof(presentdirelement.meta));
+        presentdir[dirnr].address += sizeof(presentdirelement.meta);
+
+        // Set filename
+        xram_memcpy_to(presentdir[dirnr].address, buffer, datalength);
+        presentdir[dirnr].address += datalength;
+
+        // Update present pointer
+        present = presentdir[dirnr].address;
+    }
+
+    if (presentdir[dirnr].firstelement)
+    {
+        present = presentdir[dirnr].firstelement;
+        dir_get_element(present);
+    }
+    else
+    {
+        present = 0;
+    }
+
+    dir_print_id_and_path(dirnr);
+}
+
 void dir_print_id_and_path(unsigned char dirnr)
 // Draw drive ID and path
 // Input: dirnr = directory number
@@ -405,12 +670,23 @@ void dir_print_id_and_path(unsigned char dirnr)
     // Set colors based on whether pane is active or not
     bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
 
-    // Print device name
+    // Print devide or tape name
+    // First set color and clear area
     gotoxy(0, ypos);
     cputc(A_FWBLACK);
     cputc(bg_color);
     cclear(38);
-    cputs(get_loci_devname(presentdir[dirnr].drive, 38));
+
+    if ((insidetape[dirnr]))
+    {
+        // State that we are inside a tape
+        cprintf("Tape: %.32s", mount_filename[4]);
+    }
+    else
+    {
+        // Print device name
+        cputs(get_loci_devname(presentdir[dirnr].drive, 38));
+    }
 
     // Get drive ID
     gotoxy(0, ypos + 1);
@@ -434,6 +710,7 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
 {
     unsigned char ypos = (dirnr) ? PANE2_YPOS : PANE1_YPOS;
     unsigned char bg_color, fg_color;
+    unsigned char offs;
 
     // Set colors based on whether pane is active or not
     if (activepane == dirnr)
@@ -466,8 +743,11 @@ void dir_print_entry(unsigned dirnr, unsigned char printpos)
         cputc(' ');
     }
 
+    // Set offset if in tape as first four bytes are counter
+    offs = (insidetape[dirnr]) ? 4 : 0;
+
     // Print entry data
-    cprintf("%-32.32s %.3s", presentdirelement.name, dir_entry_types[presentdirelement.meta.type - 1]);
+    cprintf("%-32.32s %.3s", presentdirelement.name + offs, dir_entry_types[presentdirelement.meta.type - 1]);
 }
 
 void dir_draw(unsigned char dirnr, unsigned char readdir)
@@ -488,7 +768,15 @@ void dir_draw(unsigned char dirnr, unsigned char readdir)
     // Read directory contents
     if (readdir)
     {
-        dir_read(dirnr, filter);
+        if (insidetape[dirnr])
+        {
+            dir_tape_parse(dirnr);
+        }
+        else
+        {
+            dir_read(dirnr, filter);
+        }
+
         presentdir[dirnr].present = presentdir[dirnr].firstprint;
     }
 
@@ -854,7 +1142,7 @@ void dir_bottom()
 void dir_select_toggle()
 // Toggle selection of active entry
 {
-    if (presentdir[activepane].firstelement && presentdirelement.meta.type > 1)
+    if (presentdir[activepane].firstelement && !insidetape[activepane] && presentdirelement.meta.type > 1)
     {
         presentdirelement.meta.select = !presentdirelement.meta.select;
         dir_save_element(present);
@@ -876,7 +1164,7 @@ void dir_select_all(unsigned char select)
 {
     unsigned element;
 
-    if (presentdir[activepane].firstelement)
+    if (presentdir[activepane].firstelement && !insidetape[activepane])
     {
         element = presentdir[activepane].firstelement;
         selection = 0;
@@ -900,7 +1188,7 @@ void dir_select_inverse()
 {
     unsigned element;
 
-    if (presentdir[activepane].firstelement)
+    if (presentdir[activepane].firstelement && !insidetape[activepane])
     {
         element = presentdir[activepane].firstelement;
         selection = 0;
@@ -933,6 +1221,9 @@ void dir_gotoroot()
     sprintf(buffer, "%1u:/", presentdir[activepane].drive);
     strncpy(presentdir[activepane].path, buffer, 4);
 
+    // If inside tape set flag to zero
+    insidetape[activepane] = 0;
+
     // Draw new dir
     dir_draw(activepane, 1);
 }
@@ -942,6 +1233,14 @@ void dir_parentdir()
 {
     unsigned char length;
     unsigned char i;
+
+    // First check if inside tape, if yes go out of tape and return
+    if (insidetape[activepane])
+    {
+        insidetape[activepane] = 0;
+        dir_draw(activepane, 1);
+        return;
+    }
 
     // Check if root dir
     length = strlen(presentdir[activepane].path);
@@ -986,7 +1285,7 @@ void dir_newdir()
 {
     char input[64] = "";
 
-    if (presentdir[activepane].firstelement)
+    if (presentdir[activepane].firstelement && !insidetape[activepane])
     {
         windownew(0, 8, 15);
 
@@ -1027,7 +1326,7 @@ void dir_newdir()
 void dir_deletedir()
 // Delete directory in active pane
 {
-    if (presentdir[activepane].firstelement && presentdirelement.meta.type == 1)
+    if (presentdir[activepane].firstelement && !insidetape[activepane] && presentdirelement.meta.type == 1)
     {
         // Derive full target path
         strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));

@@ -1,7 +1,7 @@
-# Loci Test
-# Written in 2024 by Xander Mol
+# Loci File Manager
+# Written in 2025 by Xander Mol
 # 
-# https://github.com/xahmol/locitest
+# https://github.com/xahmol/locifilemanager
 # https://www.idreamtin8bits.com/
 
 # For full credits: see src/main.c

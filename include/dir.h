@@ -49,19 +49,20 @@ extern struct Directory presentdir[2];
 // Directory reading variables
 extern DIR *dir;
 extern struct dirent *file;
-extern char dir_entry_types[6][4]; // Directory entry type name text strings
+extern char dir_entry_types[8][4]; // Directory entry type name text strings
 
 // Application variables
-extern unsigned char activepane;  // Number of active pane: 0 is upper, 1 is lower
-extern unsigned present;          // Present element
-extern unsigned previous;         // Previous element
-extern unsigned next;             // Next element
-extern unsigned char filter;      // Filter for file type, 0: None, 1: DSK, 2: TAP, 3: ROM, 4: LCE
-extern unsigned char enterchoice; // Choice for enter action: 0: Select, 1: Mount or 2: Launch
-extern unsigned char confirm;     // Confirm once (01) or all (1)
-extern unsigned char sort;        // Sort on (1) or off (0)
-extern unsigned char targetdrive; // Target drive for mount: 0: A, 1: B, 2: C, 3: D
-extern int selection;             // Selection present for file operation: 0: not present, 1: present
+extern unsigned char activepane;    // Number of active pane: 0 is upper, 1 is lower
+extern unsigned present;            // Present element
+extern unsigned previous;           // Previous element
+extern unsigned next;               // Next element
+extern unsigned char filter;        // Filter for file type, 0: None, 1: DSK, 2: TAP, 3: ROM, 4: LCE
+extern unsigned char enterchoice;   // Choice for enter action: 0: Select, 1: Mount or 2: Launch
+extern unsigned char confirm;       // Confirm once (01) or all (1)
+extern unsigned char sort;          // Sort on (1) or off (0)
+extern unsigned char targetdrive;   // Target drive for mount: 0: A, 1: B, 2: C, 3: D
+extern int selection;               // Selection present for file operation: 0: not present, 1: present
+extern unsigned char insidetape[2]; // Browser is inside a tape .TAP container file
 
 // Buffers for full paths
 extern char pathbuffer[256];
@@ -71,6 +72,7 @@ extern char pathbuffer2[256];
 void dir_get_element(unsigned address);
 void dir_save_element(unsigned address);
 void dir_read(unsigned char dirnr, unsigned char filter);
+void dir_tape_parse(unsigned char dirnr);
 void dir_print_id_and_path(unsigned char dirnr);
 void dir_print_entry(unsigned dirnr, unsigned char printpos);
 void dir_draw(unsigned char dirnr, unsigned char readdir);
