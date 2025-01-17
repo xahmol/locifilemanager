@@ -45,7 +45,8 @@ extern unsigned char ald_on;
 /* Defines for versioning */
 /* Version number */
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 10
+#define VERSION_MINOR 1
+#define VERSION_PATCH 0
 /* Build year */
 #define BUILD_YEAR_CH0 (__DATE__[ 7])
 #define BUILD_YEAR_CH1 (__DATE__[ 8])

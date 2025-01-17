@@ -152,7 +152,7 @@ void versioninfo()
     cputsxy(4, 11, buffer);
     cputsxy(4, 13, "Source, docs and credits at:");
     cputsxy(4, 14, "github.com/xahmol/locifilemanager");
-    cputsxy(4, 16, "(C) 2024, IDreamtIn8bits.com");
+    cputsxy(4, 16, "(C) 2025, IDreamtIn8bits.com");
     cputsxy(4, 18, "Press a key to continue.");
     getkey(ijk_present);
     windowrestore();
@@ -377,8 +377,8 @@ void main()
 
     // Set version number in string variable
     sprintf(version,
-            "v%2i.%2i - %c%c%c%c%c%c%c%c-%c%c%c%c",
-            VERSION_MAJOR, VERSION_MINOR,
+            "v%u.%u.%u - %c%c%c%c%c%c%c%c-%c%c%c%c",
+            VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
             BUILD_YEAR_CH0, BUILD_YEAR_CH1, BUILD_YEAR_CH2, BUILD_YEAR_CH3, BUILD_MONTH_CH0, BUILD_MONTH_CH1, BUILD_DAY_CH0, BUILD_DAY_CH1, BUILD_HOUR_CH0, BUILD_HOUR_CH1, BUILD_MIN_CH0, BUILD_MIN_CH1);
 
     // Init
