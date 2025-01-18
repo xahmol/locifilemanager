@@ -86,7 +86,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "[R]ename        ",
      "[C]opy          ",
      "Bro[W]se tape   "},
-    {"[/] Go to root",
+    {"[\\] Go to root",
      "[C LEFT] Back ",
      "Page [D]own   ",
      "Page U[P]     ",
