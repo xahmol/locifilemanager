@@ -32,7 +32,7 @@ Code and resources from others used:
 -   forum.defence-force.org: For inspiration and advice while coding.
 
 -   Original windowing system code on Commodore 128 by unknown author.
-   
+
 -   Tested using real hardware Oric Atmos plus LOCI
 
 The code can be used freely as long as you retain
@@ -193,10 +193,20 @@ void help()
 
 void boot()
 {
+
+    // Enable tape auto load if no disk mounted on A takes preference
+    if (!mount_filename[0][0] && mount_filename[4][0])
+    {
+        ald_on = 1;
+    }
+
+    // Set boot options
     mia_set_ax(0x80 | (ald_on << 4) | (bit_on << 3) | (b11_on << 2) | (tap_on << 1) | fdc_on);
+
+    // Call boot MIA operation
     VIA.ier = 0x7F; // Disable VIA interrupts
     mia_call_int_errno(MIA_OP_BOOT);
-    VIA.ier = 0xC0;
+    VIA.ier = 0xC0; // Enable VIA interrupts
     done = 1;
 }
 
@@ -368,8 +378,8 @@ void main()
     targetdrive = 0;
     selection[0] = 0;
     selection[1] = 0;
-    insidetape[0]= 0;
-    insidetape[1]= 0;
+    insidetape[0] = 0;
+    insidetape[1] = 0;
     fdc_on = 0;
     tap_on = 0;
     b11_on = 0;
@@ -456,7 +466,14 @@ void main()
                 switch (enterchoice)
                 {
                 case 0:
-                    dir_select_toggle();
+                    if (insidetape[activepane])
+                    {
+                        drive_mount();
+                    }
+                    else
+                    {
+                        dir_select_toggle();
+                    }
                     break;
 
                 case 1:

@@ -32,7 +32,7 @@ Code and resources from others used:
 -   forum.defence-force.org: For inspiration and advice while coding.
 
 -   Original windowing system code on Commodore 128 by unknown author.
-   
+
 -   Tested using real hardware Oric Atmos plus LOCI
 
 The code can be used freely as long as you retain
@@ -82,7 +82,7 @@ void drive_unmount_all()
 {
     unsigned char drive;
 
-    if(insidetape[activepane])
+    if (insidetape[activepane])
     {
         insidetape[activepane] = 0;
         dir_draw(activepane, 1);
@@ -90,7 +90,10 @@ void drive_unmount_all()
 
     for (drive = 0; drive < 6; drive++)
     {
-        umount(drive);
+        if (!(insidetape[activepane] && drive == 4))
+        {
+            umount(drive);
+        }
         mount_filename[drive][0] = 0;
         fdc_on = 0;
         tap_on = 0;
@@ -157,7 +160,6 @@ void drive_mount()
                 sprintf(buffer, "%.20s for tape.", presentdirelement.name);
                 strncpy(mount_filename[4], presentdirelement.name, 21);
                 tap_on = 1;
-                ald_on = 1;
             }
         }
 
@@ -179,7 +181,7 @@ void drive_mount()
     // Are there any files in tape listing?
     if (presentdir[activepane].firstelement && insidetape[activepane])
     {
-        tap_seek(*((long*)(presentdirelement.name)));  //Seek to start of header
+        tap_seek(*((long *)(presentdirelement.name))); // Seek to start of header
         sprintf(buffer, "Moved to file on tape.");
         menu_messagepopup(buffer);
     }
