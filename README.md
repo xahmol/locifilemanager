@@ -27,6 +27,9 @@ File manager for the LOCI mass storage device for Oric Atmos
 Link to latest build:
 - https://github.com/xahmol/locifilemanager/raw/refs/heads/main/BUILD/locifm.tap
 
+Version 0.1.1:
+- Bugfixes on tape browse and boot preference
+
 Version 0.1.0:
 - First feature complete beta release
 
