@@ -307,6 +307,51 @@ This function can be reached also by pressing the **W** key.
 
 Go to the root directory of the drive in the active pane. This function can be reached also by pressing the **\\** key.
 
+*Back*
+
+Go to the parent directory of the drive in the active pane. This function can be reached also by pressing the **Cursor Left** key.
+
+*Page down*
+
+Go to the next page of entries in the active pane. This function can be reached also by pressing the **D** key.
+
+*Page up*
+
+Go to the previous page of entries in the active pane. This function can be reached also by pressing the **P** key.
+
+*Top^
+
+Go to the first entry in the active pane. This function can be reached also by pressing the **T** key.
+
+*Bottom^
+
+Go to the last entry in the active pane. This function can be reached also by pressing the **B** key.
+
+*New dir*
+
+Create a new directory in the active pane from the active path.
+
+This will give a popup to enter the dir name. Input the name (cursor keys and DEL key can be used for editing), press **RETURN** to accept and **ESC** to cancel.
+
+This function can be reached also by pressing the **E** key.
+
+![Dir: New dir](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-%20dir%20-%20create%20dir.png?raw=true)
+
+### Info: Version information and help
+
+![Info menu](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-%20info.png?raw=true)
+
+*Version/credits*
+
+Shows version information of the application.
+
+![Info: Version](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-%20info%20-%20version.png?raw=true)
+
+*Help*
+
+Shows a help screen for the keyboard commands.
+
+![Info: Help](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-%20info%20-%20help.png?raw=true)
 
 
 ## Credits
