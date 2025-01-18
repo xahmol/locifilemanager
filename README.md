@@ -60,7 +60,7 @@ Features of this file manager:
 
 Minimum requirements:
 - a LOCI device with minimum firmware 0.2.5
-- Firmware 0.2.6 is needed for the ability to create directories
+- Firmware 0.3.0 is needed for the ability to create directories
 
 ## Start program
 ([Back to contents](#contents))
