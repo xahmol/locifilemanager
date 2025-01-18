@@ -32,7 +32,7 @@ Code and resources from others used:
 -   forum.defence-force.org: For inspiration and advice while coding.
 
 -   Original windowing system code on Commodore 128 by unknown author.
-   
+
 -   Tested using real hardware Oric Atmos plus LOCI
 
 The code can be used freely as long as you retain
@@ -74,7 +74,7 @@ unsigned char enterchoice;
 unsigned char confirm;
 unsigned char sort;
 unsigned char targetdrive;
-int selection;
+int selection[2];
 char *diraddress[2] = {(char *)DIR1BASE, (char *)DIR2BASE};
 
 char dir_entry_types[8][4] =
@@ -508,10 +508,10 @@ void dir_tape_parse(unsigned char dirnr)
         }
 
         // Debug
-        //cleararea(16, 12);
-        //gotoxy(0, 16);
-        //cprintf("CNT: %lu FN: %s ST: %4X SZ: %5d", counter, (char *)hdr.filename, start_addr, size);
-        //cgetc();
+        // cleararea(16, 12);
+        // gotoxy(0, 16);
+        // cprintf("CNT: %lu FN: %s ST: %4X SZ: %5d", counter, (char *)hdr.filename, start_addr, size);
+        // cgetc();
 
         // Misuse first four bytes of name for tape counter
         *((long *)(&buffer)) = counter;
@@ -1149,11 +1149,11 @@ void dir_select_toggle()
         dir_print_entry(activepane, presentdir[activepane].position);
         if (presentdirelement.meta.select)
         {
-            selection++;
+            selection[activepane]++;
         }
         else
         {
-            selection--;
+            selection[activepane]--;
         }
     }
 }
@@ -1167,14 +1167,14 @@ void dir_select_all(unsigned char select)
     if (presentdir[activepane].firstelement && !insidetape[activepane])
     {
         element = presentdir[activepane].firstelement;
-        selection = 0;
+        selection[activepane] = 0;
         do
         {
             dir_get_element(element);
             if (presentdirelement.meta.type > 1)
             {
                 presentdirelement.meta.select = select;
-                selection++;
+                selection[activepane]++;
                 dir_save_element(element);
             }
             element = presentdirelement.meta.next;
@@ -1191,7 +1191,7 @@ void dir_select_inverse()
     if (presentdir[activepane].firstelement && !insidetape[activepane])
     {
         element = presentdir[activepane].firstelement;
-        selection = 0;
+        selection[activepane] = 0;
         do
         {
             dir_get_element(element);
@@ -1200,11 +1200,7 @@ void dir_select_inverse()
                 presentdirelement.meta.select = !presentdirelement.meta.select;
                 if (presentdirelement.meta.select)
                 {
-                    selection++;
-                }
-                else
-                {
-                    selection--;
+                    selection[activepane]++;
                 }
                 dir_save_element(element);
             }

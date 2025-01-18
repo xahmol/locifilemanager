@@ -32,7 +32,7 @@ Code and resources from others used:
 -   forum.defence-force.org: For inspiration and advice while coding.
 
 -   Original windowing system code on Commodore 128 by unknown author.
-   
+
 -   Tested using real hardware Oric Atmos plus LOCI
 
 The code can be used freely as long as you retain
@@ -94,21 +94,21 @@ void file_copy_selected()
         return;
     }
 
-    if (presentdir[activepane].firstelement  && !insidetape[activepane])
+    if (presentdir[activepane].firstelement && !insidetape[activepane])
     {
         windownew(0, 8, 15);
 
         // If nothing is selected and cursor pos is not a dir: select single file on cursor pos
-        if (!selection && presentdirelement.meta.type > 1)
+        if (!selection[activepane] && presentdirelement.meta.type > 1)
         {
             presentdirelement.meta.select = 1;
             dir_save_element(present);
-            selection++;
+            selection[activepane]++;
         }
 
         // Print user info
         gotoxy(2, 9);
-        cprintf("Copy %u files to:", selection);
+        cprintf("Copy %u files to:", selection[activepane]);
         gotoxy(2, 10);
         cprintf("%.35s", presentdir[target].path);
 
@@ -204,10 +204,10 @@ void file_copy_selected()
         dir_draw(target, 1);
 
         // Reset selection to 0
-        if (count || selection)
+        if (count || selection[activepane])
         {
             dir_select_all(0);
-            selection = 0;
+            selection[activepane] = 0;
         }
     }
 }
@@ -224,15 +224,15 @@ void file_delete()
         windownew(0, 8, 15);
 
         // If nothing is selected and cursor pos is not a dir: select single file on cursor pos
-        if (!selection && presentdirelement.meta.type > 1)
+        if (!selection[activepane] && presentdirelement.meta.type > 1)
         {
             presentdirelement.meta.select = 1;
             dir_save_element(present);
-            selection++;
+            selection[activepane]++;
         }
 
         gotoxy(2, 9);
-        cprintf("Delete %u files:", selection);
+        cprintf("Delete %u files:", selection[activepane]);
 
         element = presentdir[activepane].firstelement;
 
@@ -292,10 +292,10 @@ void file_delete()
         dir_draw(activepane, 1);
 
         // Reset selection to 0
-        if (count || selection)
+        if (count || selection[activepane])
         {
             dir_select_all(0);
-            selection = 0;
+            selection[activepane] = 0;
         }
     }
 }

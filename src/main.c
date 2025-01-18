@@ -261,7 +261,7 @@ void mainmenuloop()
 
         case 25:
             // If no selection made and cursor is on a dir: delete dir
-            if (!selection && presentdirelement.meta.type == 1)
+            if (!selection[activepane] && presentdirelement.meta.type == 1)
             {
                 dir_deletedir();
             }
@@ -366,7 +366,8 @@ void main()
     confirm = 0;
     sort = 0;
     targetdrive = 0;
-    selection = 0;
+    selection[0] = 0;
+    selection[1] = 0;
     insidetape[0]= 0;
     insidetape[1]= 0;
     fdc_on = 0;
@@ -610,7 +611,7 @@ void main()
         case CH_DEL:
             // Del: Delete files or dir
             // If no selection made and cursor is on a dir: delete dir
-            if (!selection && presentdirelement.meta.type == 1)
+            if (!selection[activepane] && presentdirelement.meta.type == 1)
             {
                 dir_deletedir();
             }

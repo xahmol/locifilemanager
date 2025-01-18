@@ -61,7 +61,7 @@ extern unsigned char enterchoice;   // Choice for enter action: 0: Select, 1: Mo
 extern unsigned char confirm;       // Confirm once (01) or all (1)
 extern unsigned char sort;          // Sort on (1) or off (0)
 extern unsigned char targetdrive;   // Target drive for mount: 0: A, 1: B, 2: C, 3: D
-extern int selection;               // Selection present for file operation: 0: not present, 1: present
+extern int selection[2];            // Selection present for file operation: 0: not present, 1: present
 extern unsigned char insidetape[2]; // Browser is inside a tape .TAP container file
 
 // Buffers for full paths
