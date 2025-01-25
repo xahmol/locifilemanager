@@ -85,7 +85,7 @@ else
 	$(CC) -c $(CFLAGS) -o $@ $<
 endif
 
-# Buold librarry
+# Build library
 $(LIBRARY): $(LSOURCES:.c=.o) $(LASOURCES:.s=.o)
 	$(CP) $(CC65_HOME)/lib/$(CC65_TARGET).lib $(LIBRARY)
 	$(AR) a $(LIBRARY) $(LSOURCES:.c=.o) $(LASOURCES:.s=.o)

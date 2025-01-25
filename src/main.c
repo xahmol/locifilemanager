@@ -175,7 +175,7 @@ void help()
         cprintf("%c%c%-10s:%c%s", A_FWCYAN, A_BGBLACK, helpinfo[item][0], A_FWYELLOW, helpinfo[item][1]);
     }
     gotoxy(0, y++);
-    cprintf("%c%cIn main meny and pulldown menus", A_FWGREEN, A_BGBLACK);
+    cprintf("%c%cIn main menu and pulldown menus", A_FWGREEN, A_BGBLACK);
     for (item = 0; item < 2; item++)
     {
         gotoxy(0, y++);
@@ -452,7 +452,7 @@ void main()
             break;
 
         case CH_ENTER:
-            // Enter: Enter directory or perfom selected action on file
+            // Enter: Enter directory or perform selected action on file
             if (presentdir[activepane].firstelement && presentdirelement.meta.type == 1)
             {
                 strncpy(pathbuffer, presentdir[activepane].path, sizeof(pathbuffer));

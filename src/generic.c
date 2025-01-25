@@ -61,7 +61,7 @@ BUT WITHOUT ANY WARRANTY. USE THEM AT YOUR OWN RISK!
 // Generic routines
 void wait(unsigned int wait_cycles)
 // Function to wait for the specified number of cycles
-// Input: wait_cycles = numnber of cycles to wait
+// Input: wait_cycles = number of cycles to wait
 {
 
     unsigned int starttime = clock();
