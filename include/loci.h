@@ -292,7 +292,7 @@ void __fastcall__ seekdir(DIR *dir, long offs);
 void __fastcall__ rewinddir(DIR *dir);
 
 // Storage config
-#define MAXDEV 9 // Maxium of devices
+#define MAXDEV 9 // Maximum of devices
 
 struct LOCIVERSION
 {

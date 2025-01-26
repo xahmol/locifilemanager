@@ -5,7 +5,7 @@
 // - Picocomputer 6502 by Rumbledethumps, 2023, https://github.com/picocomputer/rp6502
 // - cc65 by Ullrich von Bassewitz,  Based on code by Groepaz. https://github.com/cc65/cc65
 //
-// Apapted and extended by Xander Mol, 2025
+// Adapted and extended by Xander Mol, 2025
 
 #include "loci.h"
 
@@ -26,7 +26,7 @@ long tap_tell(void)
 }
 
 long tap_read_header(tap_header_t *header)
-// Tape: Read next header from current postion of tap file
+// Tape: Read next header from current position of tap file
 // Input:   header - pointer to header structure
 // Output:  position
 {

@@ -7,7 +7,7 @@
 // - Picocomputer 6502 by Rumbledethumps, 2023, https://github.com/picocomputer/rp6502
 // - cc65 by Ullrich von Bassewitz,  Based on code by Groepaz. https://github.com/cc65/cc65
 //
-// Apapted and extended by Xander Mol, 2025
+// Adapted and extended by Xander Mol, 2025
 
 #include "loci.h"
 #include "osdklib.h"
@@ -16,7 +16,7 @@ void __fastcall__ getcwd_loci(char *buf, unsigned char len)
 // Function to copy CWD from LOCI to RAM buffer
 // Input:
 //  -   buffer: destination in RAM
-//  =   len: max length (exluding trailing zero)
+//  =   len: max length (excluding trailing zero)
 {
     unsigned char val;
     unsigned char count = 0;

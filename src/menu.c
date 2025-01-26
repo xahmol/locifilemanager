@@ -156,7 +156,7 @@ void windowrestore()
 
     windowaddress = Window[windownumber].address;
 
-    // Restore screem
+    // Restore screen
     enable_overlay_ram();
     memcpy(baseaddress, windowaddress, length);
     disable_overlay_ram();
@@ -196,7 +196,7 @@ void menu_placeheader(const char *header)
 }
 
 void menu_placebar(unsigned char y)
-// Place main meny bar at given line ycoord
+// Place main menu bar at given line ycoord
 // Input: y = y-coordinate of menu bar
 {
     unsigned char xcoord = 1;

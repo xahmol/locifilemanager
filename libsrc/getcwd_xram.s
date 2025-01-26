@@ -5,7 +5,7 @@
 ; - LOCI ROM by Sodiumlightbaby, 2024, https://github.com/sodiumlb/loci-rom
 ; - Picocomputer 6502 by Rumbledethumps, 2023, https://github.com/picocomputer/rp6502
 ;
-; Apapted and extended by Xander Mol, 2025
+; Adapted and extended by Xander Mol, 2025
 ;
 ; Sodiumlightbaby 2024
 ;
@@ -31,7 +31,7 @@
 ;       len             --> ptr1
 ;       address         --> A/X
 _getcwd_xram:
-    sta     ptr1                    ;max lenght
+    sta     ptr1                    ;max length
     stx     ptr1+1
     lda     #255
     ldx     #0

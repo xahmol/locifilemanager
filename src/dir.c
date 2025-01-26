@@ -293,7 +293,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
 
         if (presenttype)
         {
-            // Check if sufficent memory is left
+            // Check if sufficient memory is left
             if (presentdir[dirnr].address + datalength + sizeof(presentdirelement.meta) > presentdir[dirnr].address + DIRSIZE - 1)
             {
                 return;
@@ -357,7 +357,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                                 bufferdir.meta.prev = present;
                                 xram_memcpy_to(element, &bufferdir.meta, sizeof(bufferdir.meta));
 
-                                // cprintf("Insert in betweent.\n\r");
+                                // cprintf("Insert in between.\n\r");
                                 // cprintf("Prev: %4x Next: %4x BuffNPrev: %4x ", presentdirelement.meta.prev, presentdirelement.meta.next, bufferdir.meta.prev);
 
                                 xram_memcpy_from(&bufferdir.meta, presentdirelement.meta.prev, sizeof(bufferdir.meta));
@@ -371,7 +371,7 @@ void dir_read(unsigned char dirnr, unsigned char filter)
                         element = bufferdir.meta.next;
                     } while (element);
 
-                    // Insert at the ned
+                    // Insert at the end
                     if (!inserted)
                     {
                         // cprintf("Insert at the end.\n\r");
@@ -547,7 +547,7 @@ void dir_tape_parse(unsigned char dirnr)
         counter += sizeof(tap_header_t) + 4 + size;
         tap_seek(counter);
 
-        // Check if sufficent memory is left
+        // Check if sufficient memory is left
         if (presentdir[dirnr].address + datalength + sizeof(presentdirelement.meta) > presentdir[dirnr].address + DIRSIZE - 1)
         {
             TAP.cmd = TAP_CMD_REW;
@@ -609,7 +609,7 @@ void dir_tape_parse(unsigned char dirnr)
                     element = bufferdir.meta.next;
                 } while (element);
 
-                // Insert at the ned
+                // Insert at the end
                 if (!inserted)
                 {
                     // cprintf("Insert at the end.\n\r");
@@ -670,7 +670,7 @@ void dir_print_id_and_path(unsigned char dirnr)
     // Set colors based on whether pane is active or not
     bg_color = (activepane == dirnr) ? A_BGYELLOW : A_BGWHITE;
 
-    // Print devide or tape name
+    // Print device or tape name
     // First set color and clear area
     gotoxy(0, ypos);
     cputc(A_FWBLACK);
@@ -1332,7 +1332,7 @@ void dir_deletedir()
         // This fails on internal storage as that returns . and .. subdirs
         // So for internal storage rely on OS error handling instead
 
-        // Check if drive number is mot zero
+        // Check if drive number is not zero
         if (presentdir[activepane].drive)
         {
             // First: open dir

@@ -5,7 +5,7 @@
 // - Picocomputer 6502 by Rumbledethumps, 2023, https://github.com/picocomputer/rp6502
 // - cc65 by Ullrich von Bassewitz,  Based on code by Groepaz. https://github.com/cc65/cc65
 //
-// Apapted and extended by Xander Mol, 2025
+// Adapted and extended by Xander Mol, 2025
 
 #include <stdlib.h>
 #include <string.h>
@@ -32,7 +32,7 @@ DIR *__fastcall__ opendir(register const char *name)
     ret = mia_call_int_errno(MIA_OP_OPENDIR);
     d.fd = ret;
 
-    // Copy string buffer overflow safe and esnure trailing zero
+    // Copy string buffer overflow safe and ensure trailing zero
     strncpy(d.name, name, sizeof(d.name));
     d.name[256] = 0;
 
