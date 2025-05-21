@@ -79,7 +79,7 @@ unsigned char file_confirm_message(const char *message, const char *file)
     return (choice == 1) ? 1 : 0;
 }
 
-void file_copy_selected()
+void file_copy_move_selected(char move)
 //  Function to copy files from active pane to non-active pane
 {
     unsigned char confirmed = 0;
@@ -108,13 +108,13 @@ void file_copy_selected()
 
         // Print user info
         gotoxy(2, 9);
-        cprintf("Copy %u files to:", selection[activepane]);
+        cprintf("%s %u files to:", (move)?"Move":"Copy", selection[activepane]);
         gotoxy(2, 10);
         cprintf("%.35s", presentdir[target].path);
 
         element = presentdir[activepane].firstelement;
 
-        cputsxy(2, 12, "Copying file:");
+        cputsxy(2, 12, "Processing file:");
         cputsxy(2, 15, "Press ESC to cancel after next file.");
 
         // Loop through all elements to copy all selected files
@@ -175,6 +175,17 @@ void file_copy_selected()
                     break;
                 }
 
+                // Delete file if move is selected
+                if (move)
+                {
+                    // Delete file
+                    if (remove(pathbuffer2) != 0)
+                    {
+                        menu_fileerrormessage();
+                        break;
+                    }
+                }
+
                 // Check for pressing ESC to cancel
                 if (kbhit())
                 {
@@ -202,6 +213,10 @@ void file_copy_selected()
 
         // Draw new dirs
         dir_draw(target, 1);
+        if(move)
+        {
+            dir_draw(activepane, 1);
+        }
 
         // Reset selection to 0
         if (count || selection[activepane])

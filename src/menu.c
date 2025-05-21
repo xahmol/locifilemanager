@@ -32,7 +32,7 @@ Code and resources from others used:
 -   forum.defence-force.org: For inspiration and advice while coding.
 
 -   Original windowing system code on Commodore 128 by unknown author.
-   
+
 -   Tested using real hardware Oric Atmos plus LOCI
 
 The code can be used freely as long as you retain
@@ -71,7 +71,7 @@ struct MenuBar menubar = {
     {0, 0, 0, 0, 0},
     0};
 
-char pulldown_options[PULLDOWN_NUMBER] = {5, 8, 7, 7, 2, 3, 5, 4, 7, 2};
+char pulldown_options[PULLDOWN_NUMBER] = {5, 9, 7, 7, 2, 3, 5, 4, 7, 2};
 char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] = {
     {"Confirm:  Once  ",
      "Return:   Select",
@@ -85,6 +85,7 @@ char pulldown_titles[PULLDOWN_NUMBER][PULLDOWN_MAXOPTIONS][PULLDOWN_MAXLENGTH] =
      "[DEL]ete        ",
      "[R]ename        ",
      "[C]opy          ",
+     "Mo[v]e          ",
      "Bro[W]se tape   "},
     {"[\\] Go to root",
      "[C LEFT] Back ",
@@ -444,7 +445,7 @@ void menu_fileerrormessage()
 
     gotoxy(7, 11);
     cprintf("Error# : %d", errno);
-    gotoxy(7,12);
+    gotoxy(7, 12);
     cprintf("Message: %.30s", strerror(errno));
 
     cputsxy(7, 13, "Press key.");

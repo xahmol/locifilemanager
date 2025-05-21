@@ -84,7 +84,7 @@ char helpinfo[22][2][28] = {
     {"S/A/N/I", "Select toggle/all/none/inv"},
     {"O", "Sort toggle"},
     {"F", "Select filter to apply"},
-    {"C", "Copy file/selected files"},
+    {"C/V", "Copy/Move file(s)"},
     {"DEL", "Delete file(s)/dir"},
     {"G", "Select target drive mount"},
     {"R", "Rename file/dir"},
@@ -287,10 +287,14 @@ void mainmenuloop()
             break;
 
         case 27:
-            file_copy_selected();
+            file_copy_move_selected(0);
             break;
 
         case 28:
+            file_copy_move_selected(1);
+            break;
+
+        case 29:
             file_browse_tape();
             break;
 
@@ -582,7 +586,12 @@ void main()
 
         case 'c':
             // c: Copy files
-            file_copy_selected();
+            file_copy_move_selected(0);
+            break;
+
+        case 'v':
+            // v: Move files
+            file_copy_move_selected(1);
             break;
 
         case 'f':
