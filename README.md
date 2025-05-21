@@ -261,11 +261,11 @@ This function can be reached also by pressing the **R** key.
 
 ![File: Rename](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-file%20-%20rename.png?raw=true)
 
-*Copy*
+*Copy / Move*
 
-Copies the present file. Or, if a selection of files is made, all selected files. Copying directories with or without content is not (yet) implemented.
+Copies or moves the present file. Or, if a selection of files is made, all selected files. Copying or moving directories with or without content is not (yet) implemented.
 
-Copy will be performed from the directory in the active pane to the directory in the non-active pane. You can not copy to the same directory, in this case an error message will be shown:
+Copy or move will be performed from the directory in the active pane to the directory in the non-active pane. You can not copy or move to the same directory, in this case an error message will be shown:
 
 ![File: Copy - error same dir](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-file%20-%20copy%20-%20same%20dir.png?raw=true)
 
@@ -273,11 +273,11 @@ If file(s) with the same name already exist, a popup will ask for confirmation t
 
 ![File: Copy - confirm overwrite](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-file%20-%20copy%20-%20confirm.png?raw=true)
 
-Otherwise a popup will appear showing copy progress. Pressing **ESC** can cancel file copying after finishing copying the present file. Mid-file copy cancellation is not (yet) implemented.
+Otherwise a popup will appear showing copy or move progress. Pressing **ESC** can cancel file copying after finishing copying the present file. Mid-file copy cancellation is not (yet) implemented.
 
 ![File: Copy](https://github.com/xahmol/locifilemanager/blob/main/screenshots/LociFM%20-%20menu%20-file%20-%20copy.png?raw=true)
 
-This function can be reached also by pressing the **C** key.
+This function can be reached also by pressing the **C** key for copy or **V** key for move.
 
 *Browse tape*
 
