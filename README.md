@@ -109,6 +109,7 @@ For details on how to operate your LOCI device, see the [LOCI manual](https://gi
 |**O**|Toggle if directories are alphabetically s**o**rted or not
 |**F**|Select which **F**ilter to apply for showing directory entries or disable filtering.
 |**C**|**C**opy present file or all selected files from directory in active pane to directory in non-active pane
+|**V**|**C**opy present file or all selected files from directory in active pane to directory in non-active pane
 |**DEL**|**Del**ete present file or directory (if empty)
 |**G**|Select tar**g**et disk drive for disk images to mount to.
 |**R**|**R**ename present file or directory
